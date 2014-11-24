@@ -1,10 +1,11 @@
 #include <vector>
-#include <cstdlib>
+#include <random>
 
 using std::vector;
+using std::size_t;
 
-typedef long long int i64;
-typedef unsigned int size_t;
+typedef unsigned int ui32;
+typedef unsigned long long ui64;
 
 struct KeyCollision {
 };
@@ -28,30 +29,30 @@ size_t get_prime_above(size_t m) {
 }
 
 struct UniversalHashFunction {
-    size_t a, b, m, p;
+    size_t a, b, m;
+    const ui64 P = (1 << 32) + 15;
 
-    void init(size_t m, size_t p) {
+    void init(size_t m) {
         this->m = m;
-        this->p = p;
     }
 
     void randomize() {
-        a = rand();
-        b = rand();
+        a = rand() % p + 1;
+        b = rand() % p;
     }
 
-    size_t operator() (i64 x) const {
-        return (a * (unsigned long long)x + b) % p % m;
+    size_t operator() (ui32 x) const {
+        return (a * x + b) % p % m;
     }
 };
 
 struct SecondLevelTable {
     UniversalHashFunction hash;
-    vector<i64> keys;
+    vector<ui32> keys;
     vector<bool> table;
-    vector<i64> map;
+    vector<ui32> map;
 
-    bool get_iter(i64 key, vector<bool>::iterator& iter) {
+    bool get_iter(ui32 key, vector<bool>::iterator& iter) {
         if (keys.empty()) {
             return false;
         }
@@ -63,7 +64,7 @@ struct SecondLevelTable {
         return true;
     }
 
-    void add(i64 key) {
+    void add(ui32 key) {
         keys.push_back(key);
     }
 
@@ -73,8 +74,7 @@ struct SecondLevelTable {
             return;
         }
         size_t m = n*n;
-        size_t p = get_prime_above(m);
-        hash.init(m, p);
+        hash.init(m);
         table.resize(m);
         map.resize(m);
         bool fit = false;
@@ -93,44 +93,52 @@ struct SecondLevelTable {
                 table[index] = true;
                 map[index] = keys[i];
             }
-            for (size_t i = 0; i < m; i++) {
-                table[i] = false;
-            }
+            std::fill(table.begin(), table.end(), false);
         }
+    }
+
+    size_t size() const {
+        return table.size();
     }
 };
 
-class HashSet {
+class PerfectHashSet {
     UniversalHashFunction hash;
-    vector<i64> keys;
+    vector<ui32> keys;
     vector<SecondLevelTable> table;
 
-    bool get_iter(i64 key, vector<bool>::iterator& iter ) {
-        return table[hash(key)].get_iter(key, iter);           
+    bool get_iter(ui32 key, vector<bool>::iterator& iter ) {
+        return table[hash(key)].get_iter(key, iter);
     }
 
     public:
-    void init(const vector<i64>& keys) {
+    void init(const vector<ui32>& keys) {
         this->keys = keys;
         size_t m = keys.size();
-        size_t p = get_prime_above(m);
-        hash.init(m, p);
-        hash.randomize();
         table.resize(m);
-        for (size_t i = 0; i < m; ++i) { 
-            table[hash(keys[i])].add(keys[i]);
-        }
-        for (size_t i = 0; i < m; ++i) {
-            table[i].init();
+        hash.init(m);
+        while (true) {
+            hash.randomize();
+            for (ui32 key : keys) {
+                table[hash(key)].add(key);
+            }
+            size_t total_size = 0;
+            for (size_t i = 0; i < m; ++i) {
+                table[i].init();
+                total_size += table[i].size();
+            }
+            if (total_size <= 4*m) {
+                break;
+            }
         }
     }
 
-    bool has(i64 key) {
+    bool has(ui32 key) {
         vector<bool>::iterator iter;
         return get_iter(key, iter) && *iter;
     }
 
-    void set(i64 key, bool value = true) {
+    void insert(ui32 key, bool value = true) {
         vector<bool>::iterator iter;
         if (!get_iter(key, iter)) {
             throw KeyCollision();
@@ -138,8 +146,7 @@ class HashSet {
         *iter = value;
     }
 
-    void erase(i64 key) {
-        set(key, false);
+    void erase(ui32 key) {
+        insert(key, false);
     }
 };
-

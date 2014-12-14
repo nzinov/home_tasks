@@ -19,8 +19,7 @@ struct Node {
         Node* tail = this->key < other->key ? other : this;
         if (head->child == nullptr) {
             head->child = tail;
-        }
-        else {
+        } else {
             Node* child = head->child;
             while (child->brother != nullptr) {
                 child = child->brother;
@@ -34,20 +33,18 @@ struct Node {
 class BinomialHeap : public Heap {
     vector<Node*> trees;
     Node* tree(size_t);
-
-    public:
+public:
     virtual key_type get_min() const;
     virtual key_type extract_min();
     virtual void insert(key_type);
     virtual void merge(Heap*);
-    virtual ~BinomialHeap() {}
+    virtual ~BinomialHeap() {};
 };
 
 Node* BinomialHeap::tree(size_t i) {
     if (i >= trees.size()) {
         return nullptr;
-    }
-    else {
+    } else {
         return trees[i];
     }
 }

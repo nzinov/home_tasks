@@ -1,45 +1,19 @@
-#include "heap.h"
-#include <vector>
+#include "binomial_heap.h"
 
-using std::vector;
-using std::size_t;
-
-struct Node {
-    key_type key;
-    Node* brother;
-    Node* child;
-
-    Node(key_type key) : key(key) {
-        brother = nullptr;
-        child = nullptr;
-    }
-
-    Node* merge(Node* other) {
-        Node* head = this->key < other->key ? this : other;
-        Node* tail = this->key < other->key ? other : this;
-        if (head->child == nullptr) {
-            head->child = tail;
-        } else {
-            Node* child = head->child;
-            while (child->brother != nullptr) {
-                child = child->brother;
-            }
-            child->brother = tail;
+Node* Node::merge(Node* other) {
+    Node* head = this->key < other->key ? this : other;
+    Node* tail = this->key < other->key ? other : this;
+    if (!head->child) {
+        head->child = tail;
+    } else {
+        Node* child = head->child;
+        while (child->brother) {
+            child = child->brother;
         }
-        return head;
+        child->brother = tail;
     }
-};
-
-class BinomialHeap : public Heap {
-    vector<Node*> trees;
-    Node* tree(size_t);
-public:
-    virtual key_type get_min() const;
-    virtual key_type extract_min();
-    virtual void insert(key_type);
-    virtual void merge(Heap*);
-    virtual ~BinomialHeap() {};
-};
+    return head;
+}
 
 Node* BinomialHeap::tree(size_t i) {
     if (i >= trees.size()) {
@@ -49,9 +23,21 @@ Node* BinomialHeap::tree(size_t i) {
     }
 }
 
-key_type BinomialHeap::get_min() const {
+bool BinomialHeap::is_empty() const {
     if (trees.size() == 0) {
-        throw BinomialHeap();
+        return false;
+    }
+    for (Node* el : trees) {
+        if (el) {
+            return true;
+        }
+    }
+    return false;
+}
+
+key_type BinomialHeap::get_min() const {
+    if (is_empty()) {
+        throw EmptyHeapException();
     }
     key_type m = -1;
     for (Node* el : trees) {
@@ -62,8 +48,8 @@ key_type BinomialHeap::get_min() const {
 
 void BinomialHeap::merge(Heap* o) {
     BinomialHeap* other = dynamic_cast<BinomialHeap*>(o);
-    if (other == nullptr) {
-        throw BinomialHeap();
+    if (!other) {
+        throw InconsistentTypeException();
     }
     size_t size = std::max(this->trees.size(), other->trees.size());
     this->trees.resize(size);
@@ -71,6 +57,7 @@ void BinomialHeap::merge(Heap* o) {
     for (size_t i = 0; i < size; ++i) {
         size_t count = 3;
         Node* operands[3] = {this->tree(i), other->tree(i), carry};
+        carry = nullptr;
         for (size_t cur = 0; cur < count;) {
             if (operands[cur] == nullptr) {
                 operands[cur] = operands[count-1];
@@ -85,7 +72,7 @@ void BinomialHeap::merge(Heap* o) {
         }
         else if (count >= 2) {
             carry = operands[0]->merge(operands[1]);
-            this->trees[i] = operands[2];
+            this->trees[i] = (count == 3 ? operands[2] : nullptr);
         }
     }
     if (carry != nullptr) {
@@ -95,8 +82,8 @@ void BinomialHeap::merge(Heap* o) {
 }
 
 key_type BinomialHeap::extract_min() {
-    if (trees.size() == 0) {
-        throw BinomialHeap();
+    if (is_empty()) {
+        throw EmptyHeapException();
     }
     size_t min_node = 0;
     for (size_t i = 1; i < trees.size(); ++i) {
@@ -105,14 +92,11 @@ key_type BinomialHeap::extract_min() {
         }
     }
     Node* node = trees[min_node];
-    if (node == nullptr) {
-        throw BinomialHeap();
-    }
     key_type min = node->key;
-    if (node->child != nullptr) {
+    if (node->child) {
         BinomialHeap* new_heap = new BinomialHeap();
         Node* child = node->child;
-        while (child != nullptr) {
+        while (child) {
             new_heap->trees.push_back(child);
             child = child->brother;
         }

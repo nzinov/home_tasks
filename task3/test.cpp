@@ -1,5 +1,7 @@
-#include "heap_array.cpp"
-#include "binomial_heap.cpp"
+#include "heap_array.h"
+#include "binomial_heap.h"
+#include "swapping_heap.h"
+#include "leftist_heap.h"
 #include <random>
 #include <ctime>
 #include <vector>
@@ -18,6 +20,10 @@ template <typename heap_t> double run_test(const vector<TestCall>& test) {
     return static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
 }
 
+template <typename heap_t> void fine_print_test(const char* name, const vector<TestCall>& test) {
+    std::cout << "Test of " << name << " Heap, run in " << run_test<SwappingHeap<SwappingBinaryNode>>(test) << "s" << std::endl;
+}
+
 int main() {
     vector<TestCall> test(TEST_LENGTH);
     std::default_random_engine generator;
@@ -26,6 +32,8 @@ int main() {
     for (size_t i = 0; i < TEST_LENGTH; ++i)  {
         test[i] = TestCall{static_cast<FuncName>(what_function(generator)), what_arg(generator), what_arg(generator)};
     }
-    std::cout << "run in " <<run_test<BinomialHeap>(test) << "s";
+    fine_print_test<BinomialHeap>("Binomial", test);
+    fine_print_test<SwappingHeap<SwappingBinaryNode>>("Skew", test);
+    fine_print_test<LeftistHeap>("Leftist", test);
 }
 

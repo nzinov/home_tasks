@@ -81,17 +81,6 @@ int main() {
     vector<Test> tests = generate_tests(count, range);
     vector<long long> test_result = run_test(&treap, tests);
     vector<long long> control_result = run_test(&simple, tests);
-    for (Test el : tests) {
-        std::cout << names[el.command] << ' ' << el.pos << ' ' << el.left << '-' << el.right << ':' << el.value << std::endl;
-    }
-    for (long long el : test_result) {
-        std::cout << el << ' ';
-    }
-    std::cout << std::endl;
-    for (long long el : control_result) {
-        std::cout << el << ' ';
-    }
-    std::cout << std::endl;
     if (std::mismatch(test_result.begin(), test_result.end(), control_result.begin()).first == test_result.end()) {
         std::cout << "OK";
     } else {

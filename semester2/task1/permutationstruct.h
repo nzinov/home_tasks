@@ -1,3 +1,7 @@
+#ifndef PERM_H
+#define PERM_H
+#include <cstddef>
+
 class PermutationStruct {
 public:
     virtual void insert(int value, size_t pos) = 0;
@@ -5,3 +9,4 @@ public:
     virtual long long sum(size_t left, size_t right) = 0;
     virtual void next_permutation(size_t left, size_t right) = 0;
 };
+#endif

@@ -25,6 +25,8 @@ struct Node {
     }
 
     static Node* safe(Node* pointer);
+    bool decreasing();
+    bool increasing();
     void update();
     void push();
     void reverse();

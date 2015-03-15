@@ -23,15 +23,18 @@ void Node::update() {
     max = std::max({l->max, r->max, value});
     sum = value + l->sum + r->sum;
     count = 1 + l->count + r->count;
-    if (left != nullptr) {
-        left->push();
-    }
-    if (right != nullptr) {
-        right->push();
-    }
-    is_increasing = l->is_increasing && l->max <= value && r->is_increasing && r->min >= value;
-    is_decreasing = l->is_decreasing && l->min >= value && r->is_decreasing && r->max <= value;
+    is_increasing = l->increasing() && l->max <= value && r->increasing() && r->min >= value;
+    is_decreasing = l->decreasing() && l->min >= value && r->decreasing() && r->max <= value;
 }
+
+bool Node::decreasing() {
+    return (must_reverse ? is_increasing : is_decreasing);
+}
+
+bool Node::increasing() {
+    return (must_reverse ? is_decreasing : is_increasing);
+}
+
 void Node::push() {
     if (must_reverse) {
         if (left != nullptr) {
@@ -45,6 +48,7 @@ void Node::push() {
         std::swap(is_decreasing, is_increasing);
     }
 }
+
 void Node::reverse() {
     must_reverse = !must_reverse;
 }
@@ -75,7 +79,7 @@ void Node::print() {
         return;
     }
     push();
-    std::cout << "(" << value << (is_decreasing ? ">" : "") << " ";
+    std::cout << "(" << value << (decreasing() ? ">" : "") << " ";
     safe(left)->print();
     std::cout << ' ';
     safe(right)->print();
@@ -139,11 +143,12 @@ size_t Treap::find_suffix(Node* cur, int max) {
         return 0;
     }
     cur->push();
-    if (cur->is_decreasing && cur->min >= max) {
+    if (cur->decreasing() && cur->min >= max) {
         return cur->count;
     }
-    while (cur->right != nullptr && !cur->right->is_decreasing) {
+    while (cur->right != nullptr && !cur->right->decreasing()) {
         cur = cur->right;
+        cur->push();
     }
     size_t length = 0;
     if (cur->right != nullptr) {
@@ -161,7 +166,7 @@ size_t Treap::find_suffix(Node* cur, int max) {
 
 size_t Treap::find_greater(Node* cur, int val, size_t shift) {
     cur->push();
-    assert(cur->is_decreasing);
+    assert(cur->decreasing());
     if (Node::safe(cur->right)->max > val) {
         return find_greater(cur->right, val, shift + Node::safe(cur->left)->count + 1);
     } else {

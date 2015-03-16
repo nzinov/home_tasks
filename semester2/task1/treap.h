@@ -35,7 +35,7 @@ struct Node {
     static Node* merge(Node* a, Node* b);
 
     // splits node into into left = [0; pos) and right = [pos; end]
-    static void split(size_t pos, Node* node, Node*& left, Node*& right, size_t shift = 0);;
+    static void split(size_t pos, Node* node, Node*& left, Node*& right, size_t shift = 0);
     Node* get(size_t pos, size_t shift = 0);
     void set(size_t pos, int val, size_t shift = 0);
     void print();
@@ -43,11 +43,10 @@ struct Node {
 
 class Treap : public PermutationStruct {
 public:
-    virtual void insert(int value, size_t pos);
-    virtual void set(int value, size_t pos);
-    virtual int get(size_t pos);
-    virtual long long sum(size_t left, size_t right);
-    virtual void next_permutation(size_t left, size_t right);
+    virtual void insert(int value, size_t pos) override;
+    virtual void set(int value, size_t pos) override;
+    virtual long long sum(size_t left, size_t right) override;
+    virtual void next_permutation(size_t left, size_t right) override;
     Treap() : root(nullptr) {};
     Node* root;
 private:

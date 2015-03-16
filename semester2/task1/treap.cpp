@@ -167,6 +167,7 @@ size_t Treap::find_suffix(Node* cur, int max) {
 size_t Treap::find_greater(Node* cur, int val, size_t shift) {
     cur->push();
     assert(cur->decreasing());
+    assert(cur->max > val);
     if (Node::safe(cur->right)->max > val) {
         return find_greater(cur->right, val, shift + Node::safe(cur->left)->count + 1);
     } else {

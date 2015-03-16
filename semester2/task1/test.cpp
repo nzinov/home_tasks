@@ -27,7 +27,7 @@ vector<Test> generate_tests(unsigned int count, int range) {
     size_t length = 0;
     for (unsigned int i = 0; i < count; ++i) {
         Command command;
-        size_t pos, left, right;
+        size_t pos = 0, left = 0, right = 0;
         if (length == 0) {
             command = INSERT;
             pos = 0;
@@ -37,7 +37,7 @@ vector<Test> generate_tests(unsigned int count, int range) {
             right = rand() % (length - left) + left + 1;
             pos = rand() % (length + 1);
         }
-        tests.push_back(Test({command, pos, left, right, rand() % range}));
+        tests.push_back({command, pos, left, right, rand() % range});
         if (command == INSERT) {
             ++length;
         }

@@ -213,10 +213,6 @@ void Treap::set(int value, size_t pos) {
     root->set(pos, value);
 }
 
-int Treap::get(size_t pos) {
-    return root->get(pos)->value;
-}
-
 long long Treap::sum(size_t left, size_t right) {
     Node *left_buf, *right_buf;
     Node::split(left, root, left_buf, root);

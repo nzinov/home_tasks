@@ -38,26 +38,33 @@ public:
         return array[get_index(index)];
     }
 
-    T& operator[](size_t index) const {
+    T& operator[](size_t index) {
+        return at(index);
+    }
+
+    const T& operator[](size_t index) const {
         return at(index);
     }
 
     void resize() {
+        size_t new_capacity;
         if (size() + 1 == capacity) {
-            capacity *= 2;
+            new_capacity = capacity * 2;
         } else if (size()*4 < capacity) {
-            capacity /= 2;
+            new_capacity = capacity / 2 + 1;
         } else {
             return;
         }
-        T* new_array = new T[capacity];
+        T* new_array = new T[new_capacity];
+        size_t current_size = size();
         for (size_t i = 0; i < size(); ++i) {
             new_array[i] = at(i);
         }
         delete[] array;
         array = new_array;
+        capacity = new_capacity;
         begin_index = 0;
-        end_index = size();
+        end_index = current_size;
     }
 
     void push_front(T value) {
@@ -75,6 +82,7 @@ public:
     T pop_front() {
         resize();
         T val = array[begin_index];
+        begin_index = safe_add(begin_index, 1);
         return val;
     }
 
@@ -85,11 +93,11 @@ public:
     }
 
     T& back() {
-        return array[end_index];
+        return array[safe_add(end_index, -1)];
     }
 
     const T& back() const {
-        return array[end_index];
+        return array[safe_add(end_index, -1)];
     }
 
     T& front() {
@@ -181,12 +189,20 @@ public:
         return iterator(this, size());
     }
 
-    const_iterator cbegin() {
+    const_iterator cbegin() const {
         return const_iterator(this, 0);
     }
 
-    const_iterator cend() {
+    const_iterator cend() const {
         return const_iterator(this, size());
+    }
+
+    const_iterator begin() const {
+        return cbegin();
+    }
+
+    const_iterator end() const {
+        return cend();
     }
 
     std::reverse_iterator<iterator> rbegin() {
@@ -203,5 +219,13 @@ public:
 
     std::reverse_iterator<const_iterator> crend() {
         return std::reverse_iterator<const_iterator>(begin());
+    }
+
+    std::reverse_iterator<const_iterator> rbegin() const {
+        return crbegin();
+    }
+
+    std::reverse_iterator<const_iterator> rend() const {
+        return crend();
     }
 };

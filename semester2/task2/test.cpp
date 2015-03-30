@@ -71,7 +71,7 @@ TEST_F(DequeTest, Access) {
 TEST(EmptyDequeTest, Random) {
     std::deque<int> control;
     Deque<int> deque;
-    for (size_t i = 9; i < TEST_SIZE; ++i) {
+    for (size_t i = 0; i < TEST_SIZE; ++i) {
         int operand = rand();
         switch (rand() % 4) {
             case 0:

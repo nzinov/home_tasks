@@ -214,11 +214,11 @@ public:
     }
 
     std::reverse_iterator<const_iterator> crbegin() {
-        return std::reverse_iterator<const_iterator>(end());
+        return std::reverse_iterator<const_iterator>(cend());
     }
 
     std::reverse_iterator<const_iterator> crend() {
-        return std::reverse_iterator<const_iterator>(begin());
+        return std::reverse_iterator<const_iterator>(cbegin());
     }
 
     std::reverse_iterator<const_iterator> rbegin() const {

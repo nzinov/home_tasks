@@ -1,6 +1,12 @@
 #include <cstddef>
 #include <iterator>
 
+struct EmptyDequeException {
+};
+
+struct OutOfRangeException {
+};
+
 template <typename T> class Deque {
     T *array;
     size_t capacity;
@@ -35,6 +41,9 @@ public:
     }
 
     T& at(size_t index) const {
+        if (index >= size()) {
+            throw new OutOfRangeException;
+        }
         return array[get_index(index)];
     }
 
@@ -80,6 +89,9 @@ public:
     }
 
     T pop_front() {
+        if (empty()) {
+            throw new EmptyDequeException();
+        }
         resize();
         T val = array[begin_index];
         begin_index = safe_add(begin_index, 1);
@@ -87,6 +99,9 @@ public:
     }
 
     T pop_back() {
+        if (empty()) {
+            throw new EmptyDequeException();
+        }
         resize();
         end_index = safe_add(end_index, -1);
         return  array[end_index];

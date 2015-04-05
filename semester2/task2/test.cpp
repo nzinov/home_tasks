@@ -24,8 +24,12 @@ TEST_F(DequeTest, Sort) {
     EXPECT_TRUE(std::equal(control.begin(), control.end(), deque.begin()));
 }
 
-TEST_F(DequeTest, Reverse) {
+TEST_F(DequeTest, ReverseIterator) {
     EXPECT_TRUE(std::equal(control.rbegin(), control.rend(), deque.rbegin()));
+}
+
+TEST_F(DequeTest, ConstIterator) {
+    EXPECT_TRUE(std::equal(control.begin(), control.end(), deque.cbegin()));
 }
 
 TEST_F(DequeTest, PopFront) {

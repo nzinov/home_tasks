@@ -124,14 +124,15 @@ public:
     }
 
     template <bool is_const> class generic_iterator : public std::iterator<std::random_access_iterator_tag, T> {
-        Deque* target;
-        size_t index;
-
     public:
+        typedef typename std::conditional<is_const, const Deque*, Deque*>::type ptr_t;
         typedef typename std::conditional<is_const, const T*, T*>::type pointer;
         typedef typename std::conditional<is_const, const T&, T&>::type reference;
-
-        generic_iterator(Deque* target, size_t index) : target(target), index(index) {}
+    private:
+        ptr_t target;
+        size_t index;
+    public:
+        generic_iterator(ptr_t target, size_t index) : target(target), index(index) {}
 
         bool operator==(const generic_iterator& b) const {
             return index == b.index;

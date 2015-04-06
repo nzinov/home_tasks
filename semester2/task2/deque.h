@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <iterator>
+#include <boost/operators.hpp>
 
 struct EmptyDequeException {
 };
@@ -123,7 +124,9 @@ public:
         return array[begin_index];
     }
 
-    template <bool is_const> class generic_iterator : public std::iterator<std::random_access_iterator_tag, T> {
+    template <bool is_const> class generic_iterator : public boost::random_access_iterator_helper<Deque<T>::generic_iterator<is_const>, T, ptrdiff_t,
+        typename std::conditional<is_const, const T*, T*>::type,
+        typename std::conditional<is_const, const T&, T&>::type> {
     public:
         typedef typename std::conditional<is_const, const Deque*, Deque*>::type ptr_t;
         typedef typename std::conditional<is_const, const T*, T*>::type pointer;
@@ -138,14 +141,6 @@ public:
             return index == b.index;
         }
 
-        bool operator!=(const generic_iterator& b) const {
-            return index != b.index;
-        }
-
-        bool operator>(const generic_iterator& b) const {
-            return index > b.index;
-        }
-
         bool operator<(const generic_iterator& b) const {
             return index < b.index;
         }
@@ -154,19 +149,17 @@ public:
             return target->at(index);
         }
 
-        pointer operator->() const {
-            return &(target->at(index));
+        generic_iterator& operator+=(ptrdiff_t diff) {
+            index += diff;
+            return *this;
         }
 
-        generic_iterator operator+(ptrdiff_t diff) {
-            return iterator(target, index + diff);
+        generic_iterator& operator-=(ptrdiff_t diff) {
+            index -= diff;
+            return *this;
         }
 
-        generic_iterator operator-(ptrdiff_t diff) {
-            return iterator(target, index - diff);
-        }
-
-        ptrdiff_t operator-(generic_iterator& b) {
+        ptrdiff_t operator-(const generic_iterator& b) {
             return index - b.index;
         }
 
@@ -178,18 +171,6 @@ public:
         generic_iterator& operator--() {
             --index;
             return *this;
-        }
-
-        generic_iterator operator++(int) {
-            generic_iterator copy = *this;
-            ++index;
-            return copy;
-        }
-
-        generic_iterator operator--(int) {
-            generic_iterator copy = *this;
-            --index;
-            return copy;
         }
     };
 

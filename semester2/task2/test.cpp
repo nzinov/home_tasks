@@ -4,8 +4,11 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <ctime>
+#include <iostream>
 
-const size_t TEST_SIZE = 1000000;
+const size_t CHUNK_SIZE = 1000000;
+const size_t CHUNK_COUNT = 10;
 
 class DequeTest : public testing::Test {
     protected:
@@ -75,32 +78,36 @@ TEST_F(DequeTest, Access) {
 TEST(EmptyDequeTest, Random) {
     std::deque<int> control;
     Deque<int> deque;
-    for (size_t i = 0; i < TEST_SIZE; ++i) {
-        int operand = rand();
-        switch (rand() % 4) {
-            case 0:
-                deque.push_back(operand);
-                control.push_back(operand);
-                break;
-            case 1:
-                deque.push_front(operand);
-                control.push_front(operand);
-                break;
-            case 2:
-                if (control.size() == 0) {
+    for (size_t i = 0; i < CHUNK_COUNT; ++i) {
+        clock_t time = clock();
+        for (size_t c = 0; c < CHUNK_SIZE; ++c) {
+            int operand = rand();
+            switch (rand() % 4) {
+                case 0:
+                    deque.push_back(operand);
+                    control.push_back(operand);
                     break;
-                }
-                EXPECT_EQ(deque.pop_front(), control.front());
-                control.pop_front();
-                break;
-            case 3:
-                if (control.size() == 0) {
+                case 1:
+                    deque.push_front(operand);
+                    control.push_front(operand);
                     break;
-                }
-                EXPECT_EQ(deque.pop_back(), control.back());
-                control.pop_back();
-                break;
+                case 2:
+                    if (control.size() == 0) {
+                        break;
+                    }
+                    EXPECT_EQ(deque.pop_front(), control.front());
+                    control.pop_front();
+                    break;
+                case 3:
+                    if (control.size() == 0) {
+                        break;
+                    }
+                    EXPECT_EQ(deque.pop_back(), control.back());
+                    control.pop_back();
+                    break;
+            }
         }
+        std::cout << clock() - time << std::endl;
     }
 }
 

@@ -8,7 +8,7 @@ using std::string;
 vector<vector<size_t> > stupid_solution(string a, string b) {
     size_t n = a.length();
     size_t m = b.length();
-    vector<vector<size_t> > ans(m, vector<size_t>(m));
+    vector<vector<size_t> > ans(m+1, vector<size_t>(m+1, 0));
     for (size_t l = 0; l < m; ++l) {
         vector<vector<size_t> > cur(m+1, vector<size_t>(n+1));
         for (size_t r = 1; r < m - l + 1; ++r) {
@@ -19,7 +19,7 @@ vector<vector<size_t> > stupid_solution(string a, string b) {
                    cur[r][x] = std::max(cur[r-1][x], cur[r][x-1]);
                }
             }
-            ans[l][l + r -1] = cur[r][n];
+            ans[l][l + r] = cur[r][n];
         }
     }
     return ans;

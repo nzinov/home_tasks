@@ -59,7 +59,7 @@ vector<vector<size_t> > solution(string a, string b) {
             }
         }
     }
-    std::vector <std::vector < size_t > > C(n, vector<size_t>(n, 0));
+    std::vector <std::vector < size_t > > C(b.length() + 1, vector<size_t>(b.length() + 1, 0));
     for (size_t i = 0; i <= b.length(); ++i) {
         for (size_t j = 0; j <= a.length(); ++j) {
             if (D[i][j] != INF) {

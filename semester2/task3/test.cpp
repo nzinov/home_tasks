@@ -10,8 +10,8 @@ using std::string;
 vector<vector<size_t> > solution(string a, string b);
 vector<vector<size_t> > stupid_solution(string a, string b);
 
-const size_t MAX_LENGTH = 1000;
-const size_t TEST_COUNT = 1000;
+const size_t MAX_LENGTH = 100;
+const size_t TEST_COUNT = 10;
 
 string random_string()
 {

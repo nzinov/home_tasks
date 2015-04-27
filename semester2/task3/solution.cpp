@@ -23,7 +23,7 @@ int main() {
     }
     for (size_t l = 1; l <= a.length(); ++l) {
         for (size_t j = 1; j <= b.length(); ++j) {
-            if (a[l] != b[j]) {
+            if (a[l - 1] != b[j - 1]) {
                 ih[l][j] = max(iv[l][j-1], ih[l-1][j]);
                 iv[l][j] = min(iv[l][j-1], ih[l-1][j]);
             } else {
@@ -64,10 +64,11 @@ int main() {
     cout << endl;
     vector<vector<size_t> > D(n, vector<size_t>(n));
     std::copy(DG0.begin(), DG0.end(), D[0].begin());
-    for (size_t i = 1; i < n; ++i) {
+    cout << a.length() << " " << b.length() << endl;
+    for (size_t i = 1; i <= b.length(); ++i) {
         size_t k = 1;
-        for (size_t j = 0; j < n; ++j) {
-            size_t cur = (k >=n ? INF : D[i - 1][k]);
+        for (size_t j = 0; j <= a.length(); ++j) {
+            size_t cur = (k > a.length() ? INF : D[i - 1][k]);
             if (VG[i] < cur) {
                 D[i][j] = VG[i];
                 VG[i] = INF;
@@ -77,9 +78,25 @@ int main() {
             }
         }
     }
-    for (size_t i = 0; i <= a.length(); ++i) {
-        for (size_t j = 0; j <= b.length(); ++j) {
+    for (size_t i = 0; i <= b.length(); ++i) {
+        for (size_t j = 0; j <= a.length(); ++j) {
             cout << D[i][j] << " ";
+        }
+        cout << endl;
+    }
+    std::vector <std::vector < size_t > > C(n, vector<size_t>(n));
+    for (size_t i = 0; i <= b.length(); ++i) {
+        for (size_t j = 0; j <= a.length(); ++j) {
+            if (D[i][j] != INF) {
+                C[i][D[i][j]] = j;
+                C[i][D[i][j] - 1] = j - 1;
+            }
+        }
+    }
+    cout << "Answer: " << endl;
+    for (size_t i = 0; i <= b.length(); ++i) {
+        for (size_t j = 0; j <= b.length(); ++j) {
+            cout << C[i][j] << " ";
         }
         cout << endl;
     }

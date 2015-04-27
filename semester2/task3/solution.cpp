@@ -1,15 +1,11 @@
 #include <vector>
 #include <string>
-#include <iostream>
 
 using namespace std;
 
 const size_t INF = 1000000000;
 
-int main() {
-    string a, b;
-    cin >> a;
-    cin >> b;
+vector<vector<size_t> > solution(string a, string b) {
     size_t n = max(a.length(), b.length()) + 1;
     vector<vector<size_t> > ih(n, vector<size_t>(n));
     vector<vector<size_t> > iv(n, vector<size_t>(n));
@@ -79,10 +75,5 @@ int main() {
             C[i][j] = max(C[i][j], C[i][j-1]);
         }
     }
-    for (size_t i = 0; i <= b.length(); ++i) {
-        for (size_t j = 0; j <= b.length(); ++j) {
-            cout << C[i][j] << " ";
-        }
-        cout << endl;
-    }
+    return C;
 }

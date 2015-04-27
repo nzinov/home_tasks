@@ -1,16 +1,11 @@
 #include <string>
 #include <cstddef>
 #include <vector>
-#include <iostream>
 
 using std::vector;
-using std::cin;
-using std::cout;
 using std::string;
 
-int main() {
-    string a, b;
-    cin >> a >> b;
+vector<vector<size_t> > stupid_solution(string a, string b) {
     size_t n = a.length();
     size_t m = b.length();
     vector<vector<size_t> > ans(m, vector<size_t>(m));
@@ -27,11 +22,6 @@ int main() {
             ans[l][l + r -1] = cur[r][n];
         }
     }
-    for (size_t i = 0; i < m; ++i) {
-        for (size_t j = 0; j < m; ++j) {
-            cout << ans[i][j] << ' ';
-        }
-        cout << std::endl;
-    }
+    return ans;
 }
 

@@ -84,13 +84,25 @@ int main() {
         }
         cout << endl;
     }
-    std::vector <std::vector < size_t > > C(n, vector<size_t>(n));
+    std::vector <std::vector < size_t > > C(n, vector<size_t>(n, 0));
+    for (size_t i = 0; i <= b.length(); ++i) {
+        for (size_t j = 1; j <= b.length(); ++j) {
+            C[i][j] = 0;
+        }
+    }
     for (size_t i = 0; i <= b.length(); ++i) {
         for (size_t j = 0; j <= a.length(); ++j) {
             if (D[i][j] != INF) {
                 C[i][D[i][j]] = j;
-                C[i][D[i][j] - 1] = j - 1;
+                if (D[i][j] > 0 && j > 0) {
+                    C[i][D[i][j] - 1] = j - 1;
+                }
             }
+        }
+    }
+    for (size_t i = 0; i <= b.length(); ++i) {
+        for (size_t j = 1; j <= b.length(); ++j) {
+            C[i][j] = max(C[i][j], C[i][j-1]);
         }
     }
     cout << "Answer: " << endl;

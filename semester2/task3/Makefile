@@ -29,7 +29,7 @@ CXXFLAGS += -g -std=c++11 -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = test
+TESTS = weird_test
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -39,6 +39,9 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 # House-keeping build targets.
 
 all : $(TESTS)
+
+test :
+	./weird_test
 
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
@@ -71,5 +74,5 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-test : test.o solution.o stupid_solution.o gtest_main.a
+weird_test : test.o solution.o stupid_solution.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

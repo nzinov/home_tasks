@@ -52,6 +52,12 @@ int main() {
         cout << el << " ";
     }
     cout << endl;
+    for (size_t i = 0; i < a.length() + 1; ++i ) {
+        for (size_t j = 0; j < b.length() + 1; ++j ) {
+            cout << iv[i][j] << "/" << ih[i][j] << " ";
+        }
+        cout << endl;
+    }
     for (size_t el : VG) {
         cout << el << " ";
     }

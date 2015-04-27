@@ -1,3 +1,4 @@
+#include <string>
 #include <cstddef>
 #include <vector>
 #include <iostream>
@@ -5,19 +6,13 @@
 using std::vector;
 using std::cin;
 using std::cout;
+using std::string;
 
 int main() {
-    size_t n = 0, m = 0;
-    cin >> n;
-    cin >> m;
-    vector<char> a(n);
-    vector<char> b(m);
-    for (size_t i = 0; i < n; ++i) {
-        cin >> a[i];
-    }
-    for (size_t i = 0; i < m; ++i) {
-        cin >> b[i];
-    }
+    string a, b;
+    cin >> a >> b;
+    size_t n = a.length();
+    size_t m = b.length();
     vector<vector<size_t> > ans(m, vector<size_t>(m));
     for (size_t l = 0; l < m; ++l) {
         vector<vector<size_t> > cur(m+1, vector<size_t>(n+1));

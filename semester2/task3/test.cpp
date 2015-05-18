@@ -17,7 +17,7 @@ string random_string()
 {
     auto randchar = []() -> char
         {
-            const char charset[] = "xyzwijklmnopYZ";
+            const char charset[] = "YZ";
             const size_t max_index = (sizeof(charset) - 1);
             return charset[rand() % max_index];
         };

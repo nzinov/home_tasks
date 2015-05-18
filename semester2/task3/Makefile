@@ -75,4 +75,4 @@ gtest_main.a : gtest-all.o gtest_main.o
 # function.
 
 weird_test : test.o solution.o stupid_solution.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -O3

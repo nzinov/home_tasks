@@ -27,9 +27,9 @@ vector<vector<size_t> > solution(const string& a, const string& b) {
             }
         }
     }
-    n = max(n, m) + 1;
-    vector<size_t> unique_elements(n);
-    vector<size_t> first_line(n);
+    size_t size = max(n, m) + 1;
+    vector<size_t> unique_elements(size);
+    vector<size_t> first_line(size);
     for (size_t j = 1; j <= m; ++j) {
         unique_elements[j] = INF;
     }
@@ -46,7 +46,7 @@ vector<vector<size_t> > solution(const string& a, const string& b) {
     for (size_t l = i; l <= a.length(); ++l) {
         first_line[l] = INF;
     }
-    vector<vector<size_t> > graph_points(n, vector<size_t>(n));
+    vector<vector<size_t> > graph_points(size, vector<size_t>(size));
     std::copy(first_line.begin(), first_line.end(), graph_points[0].begin());
     for (size_t i = 1; i <= b.length(); ++i) {
         size_t k = 1;

@@ -5,20 +5,19 @@ using namespace std;
 
 const size_t INF = 1000000000;
 
-vector<vector<size_t> > solution(string a, string b) {
-    size_t n = max(a.length(), b.length()) + 1;
-    vector<vector<size_t> > horizontal_weight(n, vector<size_t>(n));
-    vector<vector<size_t> > vertical_weight(n, vector<size_t>(n));
-    vector<size_t> unique_elements(n);
-    vector<size_t> first_line(n);
-    for (size_t j = 0; j <= b.length(); ++j) {
+vector<vector<size_t> > solution(const string& a, const string& b) {
+    size_t n = a.length();
+    size_t m = b.length();
+    vector<vector<size_t> > horizontal_weight(n + 1, vector<size_t>(m + 1));
+    vector<vector<size_t> > vertical_weight(n + 1, vector<size_t>(m + 1));
+    for (size_t j = 0; j <= m; ++j) {
         horizontal_weight[0][j] = j;
     }
-    for (size_t l = 0; l <= a.length(); ++l) {
+    for (size_t l = 0; l <= n; ++l) {
         vertical_weight[l][0] = 0;
     }
-    for (size_t l = 1; l <= a.length(); ++l) {
-        for (size_t j = 1; j <= b.length(); ++j) {
+    for (size_t l = 1; l <= n; ++l) {
+        for (size_t j = 1; j <= m; ++j) {
             if (a[l - 1] != b[j - 1]) {
                 horizontal_weight[l][j] = max(vertical_weight[l][j-1], horizontal_weight[l-1][j]);
                 vertical_weight[l][j] = min(vertical_weight[l][j-1], horizontal_weight[l-1][j]);
@@ -28,7 +27,10 @@ vector<vector<size_t> > solution(string a, string b) {
             }
         }
     }
-    for (size_t j = 1; j <= b.length(); ++j) {
+    n = max(n, m) + 1;
+    vector<size_t> unique_elements(n);
+    vector<size_t> first_line(n);
+    for (size_t j = 1; j <= m; ++j) {
         unique_elements[j] = INF;
     }
     first_line[0] = 0;
@@ -59,9 +61,9 @@ vector<vector<size_t> > solution(string a, string b) {
             }
         }
     }
-    std::vector <std::vector < size_t > > answer(b.length() + 1, vector<size_t>(b.length() + 1, 0));
-    for (size_t i = 0; i <= b.length(); ++i) {
-        for (size_t j = 0; j <= a.length(); ++j) {
+    std::vector <std::vector < size_t > > answer(m + 1, vector<size_t>(m + 1, 0));
+    for (size_t i = 0; i <= m; ++i) {
+        for (size_t j = 0; j <= n; ++j) {
             if (graph_points[i][j] != INF) {
                 answer[i][graph_points[i][j]] = j;
                 if (graph_points[i][j] > 0 && j > 0) {
@@ -70,8 +72,8 @@ vector<vector<size_t> > solution(string a, string b) {
             }
         }
     }
-    for (size_t i = 0; i <= b.length(); ++i) {
-        for (size_t j = 1; j <= b.length(); ++j) {
+    for (size_t i = 0; i <= m; ++i) {
+        for (size_t j = 1; j <= m; ++j) {
             answer[i][j] = max(answer[i][j], answer[i][j-1]);
         }
     }

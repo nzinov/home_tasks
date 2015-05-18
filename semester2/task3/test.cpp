@@ -7,17 +7,17 @@
 using std::vector;
 using std::string;
 
-vector<vector<size_t> > solution(string a, string b);
+vector<vector<size_t> > solution(const string& a, const string& b);
 vector<vector<size_t> > stupid_solution(string a, string b);
 
-const size_t MAX_LENGTH = 100;
+const size_t MAX_LENGTH = 500;
 const size_t TEST_COUNT = 10;
 
 string random_string()
 {
     auto randchar = []() -> char
         {
-            const char charset[] = "XYZWxyzw57abcdefghijklmnopqrstuv";
+            const char charset[] = "xyzwijklmnopYZ";
             const size_t max_index = (sizeof(charset) - 1);
             return charset[rand() % max_index];
         };

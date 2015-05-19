@@ -9,6 +9,7 @@
 
 using std::vector;
 using std::set;
+using namespace std::placeholders;
 
 struct SimpleVertex {
 };
@@ -20,7 +21,7 @@ enum State {
 };
 
 template<typename Path>struct VertexStruct {
-    Path bestpath;
+    Path best_path;
     size_t precursor;
     State state;
 
@@ -41,16 +42,21 @@ struct GenericEdge {
  * the first path is shorter than the second
  */
 template<typename Edge, typename Path,
-    typename cmp, typename get_edges> class DijkstraSolver {
+    typename _Cmp, typename _Get_edges> class DijkstraSolver {
     vector<VertexStruct<Path> > vertices;
-    set<size_t, std::function<bool(size_t, size_t)> > queue;
+    set<size_t, std::function<bool(size_t, size_t)>> queue;
     size_t start, end;
+    _Cmp cmp;
+    _Get_edges get_edges;
 
-    DijkstraSolver() :
-        queue(std::function<bool(size_t, size_t)>(&this->vertex_cmp)) {}
+public:
+    DijkstraSolver(_Cmp cmp, _Get_edges get_edges) :
+        cmp(cmp),
+        get_edges(get_edges),
+        queue(std::function<bool(size_t, size_t)>(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2))) {}
 
     bool vertex_cmp(size_t a, size_t b) {
-        return cmp(vertices[a].bestpath, vertices[b].bestpath);
+        return cmp(vertices[a].best_path, vertices[b].best_path);
     }
     
     void allocate(size_t v) {
@@ -78,21 +84,21 @@ template<typename Edge, typename Path,
         }
         allocate(edge.head);
         Path new_path = vertices[edge.tail].best_path.extend(edge);
-        if (target.state == NOT_VISITED ||
-                cmp(new_path, vertices[edge.end].best_path)) {
+        if (target.state == NOT_VISITED || cmp(new_path, vertices[edge.head].best_path)) {
             queue.erase(edge.head);
             target.state = VISITED;
-            target.path = new_path;
-            target.precursor = edge.start;
+            target.best_path = new_path;
+            target.precursor = edge.tail;
         }
     }
 
 public:
     vector<size_t> find_path(size_t a, size_t b) {
-        vertices.clear()
+        vertices.clear();
         queue.insert(a); 
         start = a;
         end = b;
+        allocate(b);
         while (vertices[b].state != FREEZED) {
             size_t cur = *queue.begin();
             allocate(cur);

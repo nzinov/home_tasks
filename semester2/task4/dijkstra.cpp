@@ -1,12 +1,14 @@
+#ifndef dijkstra
+#define dijkstra
+
 #include <vector>
 #include <cstdlib>
 #include <set>
 #include <functional>
+#include <algorithm>
 
 using std::vector;
 using std::set;
-
-typedef unsigned int size_t;
 
 struct SimpleVertex {
 };
@@ -17,102 +19,90 @@ enum State {
     FREEZED
 };
 
-template<typename Vertex, typename Path>struct VertexStruct : public Vertex {
+template<typename Path>struct VertexStruct {
     Path bestpath;
-    size_t parent;
+    size_t precursor;
     State state;
 
-    VertexStruct(Vertex vertex) : Vertex(vertex) {
+    VertexStruct() {
         state = NOT_VISITED;
     }
 };
 
-template<typename Edge> struct EdgeStruct : public Edge {
-    size_t start;
-    size_t end;
+struct GenericEdge {
+    size_t tail;
+    size_t head;
 
-    EdgeStruct(size_t start, size_t end): start(start), end(end) {}
+    GenericEdge(size_t tail, size_t head) : tail(tail), head(head) {}
 };
 
-struct SimpleEdge {
-    int weight;
-    size_t end;
-    SimpleEdge(int weight, size_t end) : weight(weight), end(end) {}
-};
+/*
+ * cmp must return true if and only if
+ * the first path is shorter than the second
+ */
+template<typename Edge, typename Path,
+    typename cmp, typename get_edges> class DijkstraSolver {
+    vector<VertexStruct<Path> > vertices;
+    set<size_t, std::function<bool(size_t, size_t)> > queue;
+    size_t start, end;
 
-struct SimplePath {
-    int length;
-    SimplePath(int length) : length(length) {}
-
-    SimplePath extend(SimpleEdge& edge) {
-        return SimplePath(length + edge.weight);
-    }
-};
-
-bool SimpleCmp(SimplePath& a, SimplePath& b) {
-    return a.length < b.length;
-}
-
-template<typename Vertex, typename Edge, typename Path, typename cmp> class Graph {
-    vector<VertexStruct<Vertex, Path> > vertices;
-    vector<vector<EdgeStruct<Edge> > > edges;
-
-    set<size_t, std::mem_fun_t<bool, Graph> > queue;
-
-    Graph() {
-        queue.cmp = std::mem_fn(&this->vertex_cmp);
-    }
+    DijkstraSolver() :
+        queue(std::function<bool(size_t, size_t)>(&this->vertex_cmp)) {}
 
     bool vertex_cmp(size_t a, size_t b) {
         return cmp(vertices[a].bestpath, vertices[b].bestpath);
     }
     
+    void allocate(size_t v) {
+        if (vertices.size() <= v) {
+            vertices.resize(v+1);
+        }
+    }
+
+    vector<size_t> get_path() {
+        vector<size_t> path;
+        for (size_t cursor = end; cursor != start;
+                cursor = vertices[cursor].precursor) {
+            path.push_back(cursor);
+        }
+        path.push_back(end);
+        std::reverse(path.begin(), path.end());
+        return path;
+    }
+
+
+    void relax(const Edge& edge) {
+        VertexStruct<Path>& target = vertices[edge.head];
+        if (target.state == FREEZED) {
+            return;
+        }
+        allocate(edge.head);
+        Path new_path = vertices[edge.tail].best_path.extend(edge);
+        if (target.state == NOT_VISITED ||
+                cmp(new_path, vertices[edge.end].best_path)) {
+            queue.erase(edge.head);
+            target.state = VISITED;
+            target.path = new_path;
+            target.precursor = edge.start;
+        }
+    }
+
+public:
     vector<size_t> find_path(size_t a, size_t b) {
+        vertices.clear()
         queue.insert(a); 
+        start = a;
+        end = b;
         while (vertices[b].state != FREEZED) {
-            size_t cur = queue.front();
-            queue.remove(cur);
+            size_t cur = *queue.begin();
+            allocate(cur);
+            queue.erase(queue.begin());
             vertices[cur].state = FREEZED;
-            for (Edge& edge : edges[cur]) {
+            for (Edge& edge : get_edges(cur)) {
                 relax(edge);
             }
         }
-        return path_iterator(b);
+        return get_path();
     }
-
-    void relax(EdgeStruct<Edge> edge) {
-        if (vertices[edge.end].state == FREEZED) {
-            return;
-        }
-        Path new_path = vertices[edge.start].best_path.extend(edge);
-        if (vertices[edge.end].state == NOT_VISITED) {
-            vertices[edge.end].best_path = new_path;
-            queue.insert(edge.end);
-        } else {
-            if (cmp(new_path, vertices[edge.end].best_path)) {
-                queue.remove(edge.end);
-                vertices[edge.end].state = VISITED;
-                vertices[edge.end].path = new_path;
-                vertices[edge.end].parent = edge.start;
-            }
-        }
-    }
-
-    struct path_iterator : std::iterator<std::output_iterator_tag, size_t, void, size_t&, size_t*> {
-        Graph parent;
-        size_t vertex;
-
-        path_iterator(Graph parent, size_t vertex) : parent(parent), vertex(vertex) {}
-        size_t operator*() {
-            return vertex;
-        }
-
-        bool operator==(path_iterator& other) {
-            return other.vertex == vertex;
-        }
-
-        size_t operator++() {
-            vertex = parent->vertices[vertex].parent;
-        }
-    };
 };
+#endif

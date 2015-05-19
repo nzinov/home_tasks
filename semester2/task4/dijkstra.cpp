@@ -6,6 +6,7 @@
 #include <set>
 #include <functional>
 #include <algorithm>
+#include <iostream>
 
 using std::vector;
 using std::set;
@@ -56,6 +57,10 @@ public:
         queue(std::function<bool(size_t, size_t)>(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2))) {}
 
     bool vertex_cmp(size_t a, size_t b) {
+        if (!(cmp(vertices[a].best_path, vertices[b].best_path) ||
+                cmp(vertices[b].best_path, vertices[a].best_path))) {
+            return a < b;
+        }
         return cmp(vertices[a].best_path, vertices[b].best_path);
     }
     
@@ -85,10 +90,13 @@ public:
         allocate(edge.head);
         Path new_path = vertices[edge.tail].best_path.extend(edge);
         if (target.state == NOT_VISITED || cmp(new_path, vertices[edge.head].best_path)) {
+            std::cout << "update " << edge.head << " from " << edge.tail <<
+                " to " << new_path.length << std::endl;
             queue.erase(edge.head);
             target.state = VISITED;
             target.best_path = new_path;
             target.precursor = edge.tail;
+            queue.insert(edge.head);
         }
     }
 
@@ -100,7 +108,11 @@ public:
         end = b;
         allocate(b);
         while (vertices[b].state != FREEZED) {
+            if (queue.empty()) {
+                std::cout << "error";
+            }
             size_t cur = *queue.begin();
+            std::cout << "get " << cur << std::endl;
             allocate(cur);
             queue.erase(queue.begin());
             vertices[cur].state = FREEZED;
@@ -108,6 +120,7 @@ public:
                 relax(edge);
             }
         }
+        std::cout << vertices[b].best_path.length << std::endl;
         return get_path();
     }
 };

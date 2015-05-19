@@ -40,6 +40,9 @@ TEST(DijkstraTest, Simple) {
     vector<SimpleEdge> edges = {
         SimpleEdge(1, 2, 7),
         SimpleEdge(1, 3, 9),
+        SimpleEdge(1, 6, 14),
+        SimpleEdge(2, 3, 10),
+        SimpleEdge(2, 4, 15),
         SimpleEdge(3, 6, 2),
         SimpleEdge(3, 4, 11),
         SimpleEdge(6, 5, 9),

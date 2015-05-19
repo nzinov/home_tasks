@@ -1,5 +1,4 @@
 language: cpp
 compiler:
   - gcc
-  - clang
-script: cd semester2/task3 && make && make test
+script: cd semester2/task4 && make && make test

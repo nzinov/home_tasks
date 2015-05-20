@@ -51,12 +51,6 @@ template<typename Edge, typename Path,
     _Cmp cmp;
     _Get_edges get_edges;
 
-public:
-    DijkstraSolver(_Cmp cmp, _Get_edges get_edges) :
-        cmp(cmp),
-        get_edges(get_edges),
-        queue(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2)) {}
-
     bool vertex_cmp(size_t a, size_t b) {
         if (!(cmp(vertices[a].best_path, vertices[b].best_path) ||
                 cmp(vertices[b].best_path, vertices[a].best_path))) {
@@ -103,6 +97,11 @@ public:
     }
 
 public:
+    DijkstraSolver(_Cmp cmp, _Get_edges get_edges) :
+        cmp(cmp),
+        get_edges(get_edges),
+        queue(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2)) {}
+
     vector<size_t> find_path(size_t a, size_t b) {
         vertices.clear();
         queue.insert(a); 
@@ -118,7 +117,7 @@ public:
             allocate(cur);
             queue.erase(queue.begin());
             vertices[cur].state = FREEZED;
-            for (Edge& edge : get_edges(cur)) {
+            for (const Edge& edge : get_edges(cur)) {
                 relax(edge);
             }
         }

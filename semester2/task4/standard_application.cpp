@@ -54,8 +54,10 @@ TEST(DijkstraTest, Simple) {
     graph.add_edge(4, 5, 6);
     auto solver = get_solver<SimpleEdge, SimplePath>(
         std::bind(&SimpleGraph::get_edges, graph, _1));
-    vector<size_t> answer = solver.find_path(1, 5);
+    auto answer = solver.find_path(1, 5);
     vector<size_t> test_answer = {1, 3, 6, 5}; 
     std::cout << std::endl;
-    EXPECT_TRUE(std::equal(test_answer.begin(), test_answer.end(), answer.begin()));
+    EXPECT_EQ(answer.first.length, 20);
+    EXPECT_TRUE(std::equal(test_answer.begin(), test_answer.end(), answer.second.begin()));
+    EXPECT_THROW(solver.find_path(0, 1), NoPathException);
 }

@@ -37,11 +37,27 @@ struct GenericEdge {
     GenericEdge(size_t tail, size_t head) : tail(tail), head(head) {}
 };
 
-/*
- * cmp must return true if and only if
- * the first path is shorter than the second
- */
+struct NoPathException {
+};
 
+/*
+ * Customized version of Dijkstra algorithm
+ *
+ * 'Edge' template argument must be a struct
+ * representing edge of your graph
+ * with members 'tail' ans 'head' of size_t and any other members.
+ * You are encouraged to inherit from GenericEdge struct.
+ *
+ * 'Path' template argument must be a struct
+ * representing path in your graph
+ * with operator< overloaded in terms of shorter path
+ * and method 'extend' taking Edge and returning
+ * a new path resulting from extending current path by the edge.
+ * 
+ * 'get_edges' parameter is a function
+ * with size_t argument v
+ * returning container of all edges begining in v.
+ */
 template<typename Edge, typename Path,
         typename _Get_edges> class DijkstraSolver {
     vector<VertexStruct<Path> > vertices;
@@ -97,13 +113,18 @@ public:
         get_edges(get_edges),
         queue(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2)) {}
 
-    vector<size_t> find_path(size_t a, size_t b) {
+    /*
+     * arguments: vertices to find path between
+     * returns: pair of the best Path between a and b and vector<size_t> of vertices on that path
+     * throws: NoPathException if there is no path between a and b
+     */
+    std::pair<Path, vector<size_t> > find_path(size_t a, size_t b) {
         vertices.clear();
         queue.insert(a); 
         start = a;
         end = b;
         allocate(b);
-        while (vertices[b].state != FREEZED) {
+        while (vertices[b].state != FREEZED && !queue.empty()) {
             if (queue.empty()) {
             }
             size_t cur = *queue.begin();
@@ -114,10 +135,16 @@ public:
                 relax(edge);
             }
         }
-        return get_path();
+        if (vertices[b].state == NOT_VISITED) {
+            throw NoPathException();
+        }
+        return std::make_pair(vertices[b].best_path, get_path());
     }
 };
 
+/*
+   Returns a new instance of DijkstraSolver
+ */
 template<typename Edge, typename Path,
         typename _Get_edges>
         DijkstraSolver<Edge, Path, _Get_edges>

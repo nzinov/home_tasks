@@ -69,7 +69,7 @@ template<typename Edge, typename Path,
                 cursor = vertices[cursor].precursor) {
             path.push_back(cursor);
         }
-        path.push_back(end);
+        path.push_back(start);
         std::reverse(path.begin(), path.end());
         return path;
     }

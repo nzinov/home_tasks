@@ -29,7 +29,7 @@ bool SimpleCmp(SimplePath& a, SimplePath& b) {
 struct SimpleGraph {
     vector<vector<SimpleEdge> > edges;
 
-    SimpleGraph(size_t vertex_number) : edges(vertex_number, vector<SimpleEdge>(vertex_number)) {}
+    SimpleGraph(size_t vertex_number) : edges(vertex_number) {}
 
     const vector<SimpleEdge>& get_edges(size_t v) {
         return edges[v];
@@ -42,7 +42,7 @@ struct SimpleGraph {
 };
 
 TEST(DijkstraTest, Simple) {
-    SimpleGraph graph;
+    SimpleGraph graph(7);
     graph.add_edge(1, 2, 7);
     graph.add_edge(1, 3, 9);
     graph.add_edge(1, 6, 14);

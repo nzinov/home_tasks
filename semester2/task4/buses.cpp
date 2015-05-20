@@ -5,14 +5,13 @@
 using namespace std::placeholders;
 
 typedef long long time_type;
-typedef unsigned int size_t;
 
 struct Route : GenericEdge {
     time_type departure;
     time_type duration;
     time_type interval;
 
-    Route(size_t tail, size_t head, time_type departure, time_type duration, time_type, interval) :
+    Route(size_t tail, size_t head, time_type departure, time_type duration, time_type interval) :
         GenericEdge(tail, head), departure(departure), duration(duration), interval(interval) {}
 };
 
@@ -36,6 +35,8 @@ bool BusCmp(const BusPath& a, const BusPath& b) {
 struct Schedule {
     vector<vector<Route> > routes;
 
+    Schedule(size_t n) : routes(n) {};
+
     const vector<Route>& get_routes(size_t v) {
         return routes[v];
     }
@@ -46,7 +47,7 @@ struct Schedule {
 };
 
 TEST(DijkstraTest, Bus) {
-    Schedule schedule;
+    Schedule schedule(2);
     schedule.add_route(Route(0, 1, 5, 5, 3));
     auto solver = get_solver<Route, BusPath>(
         std::bind(BusCmp, _1, _2),

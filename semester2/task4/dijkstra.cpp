@@ -6,7 +6,6 @@
 #include <set>
 #include <functional>
 #include <algorithm>
-#include <iostream>
 
 using std::vector;
 using std::set;
@@ -86,8 +85,6 @@ template<typename Edge, typename Path,
         Path new_path = vertices[edge.tail].best_path.extend(edge);
         if (target.state == NOT_VISITED ||
                 cmp(new_path, vertices[edge.head].best_path)) {
-            std::cout << "update " << edge.head << " from " << edge.tail <<
-                " to " << new_path.length << std::endl;
             queue.erase(edge.head);
             target.state = VISITED;
             target.best_path = new_path;
@@ -110,10 +107,8 @@ public:
         allocate(b);
         while (vertices[b].state != FREEZED) {
             if (queue.empty()) {
-                std::cout << "error";
             }
             size_t cur = *queue.begin();
-            std::cout << "get " << cur << std::endl;
             allocate(cur);
             queue.erase(queue.begin());
             vertices[cur].state = FREEZED;
@@ -121,7 +116,6 @@ public:
                 relax(edge);
             }
         }
-        std::cout << vertices[b].best_path.length << std::endl;
         return get_path();
     }
 };

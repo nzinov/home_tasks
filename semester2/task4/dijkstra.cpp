@@ -129,7 +129,9 @@ public:
 
 template<typename Edge, typename Path,
     typename _Cmp, typename _Get_edges>
-    auto get_solver(_Cmp cmp, _Get_edges get_edges) {
-        return DijkstraSolver<Edge, Path, _Cmp, _Get_edges>(cmp, get_edges);
+    DijkstraSolver<Edge, Path, _Cmp, _Get_edges>
+            get_solver(_Cmp cmp, _Get_edges get_edges) {
+        return DijkstraSolver<Edge, Path,
+            _Cmp, _Get_edges>(cmp, get_edges);
 }
 #endif

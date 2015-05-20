@@ -51,10 +51,8 @@ TEST(DijkstraTest, Simple) {
     for (SimpleEdge edge : edges) {
         edges.push_back(SimpleEdge(edge.head, edge.tail, edge.weight));
     }
-    DijkstraSolver<SimpleEdge, SimplePath,
-        bool(*)(SimplePath&, SimplePath&),
-        std::function<vector<SimpleEdge>(size_t)> >
-            solver(SimpleCmp,
-                    std::bind(get_edges, edges, _1));
+    auto solver = get_solver<SimpleEdge, SimplePath>(
+        std::bind(SimpleCmp, _1, _2),
+        std::bind(get_edges, edges, _1));
     solver.find_path(1, 5);
 }

@@ -42,8 +42,9 @@ struct GenericEdge {
  * cmp must return true if and only if
  * the first path is shorter than the second
  */
+
 template<typename Edge, typename Path,
-    typename _Cmp, typename _Get_edges> class DijkstraSolver {
+        typename _Cmp, typename _Get_edges> class DijkstraSolver {
     vector<VertexStruct<Path> > vertices;
     set<size_t, std::function<bool(size_t, size_t)>> queue;
     size_t start, end;
@@ -54,7 +55,7 @@ public:
     DijkstraSolver(_Cmp cmp, _Get_edges get_edges) :
         cmp(cmp),
         get_edges(get_edges),
-        queue(std::function<bool(size_t, size_t)>(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2))) {}
+        queue(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2)) {}
 
     bool vertex_cmp(size_t a, size_t b) {
         if (!(cmp(vertices[a].best_path, vertices[b].best_path) ||
@@ -89,7 +90,8 @@ public:
         }
         allocate(edge.head);
         Path new_path = vertices[edge.tail].best_path.extend(edge);
-        if (target.state == NOT_VISITED || cmp(new_path, vertices[edge.head].best_path)) {
+        if (target.state == NOT_VISITED ||
+                cmp(new_path, vertices[edge.head].best_path)) {
             std::cout << "update " << edge.head << " from " << edge.tail <<
                 " to " << new_path.length << std::endl;
             queue.erase(edge.head);
@@ -124,4 +126,10 @@ public:
         return get_path();
     }
 };
+
+template<typename Edge, typename Path,
+    typename _Cmp, typename _Get_edges>
+    auto get_solver(_Cmp cmp, _Get_edges get_edges) {
+        return DijkstraSolver<Edge, Path, _Cmp, _Get_edges>(cmp, get_edges);
+}
 #endif

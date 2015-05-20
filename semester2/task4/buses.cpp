@@ -26,11 +26,11 @@ struct BusPath {
         }
         return BusPath(departure + route.duration);
     }
-};
 
-bool BusCmp(const BusPath& a, const BusPath& b) {
-    return a.end_time < b.end_time;
-}
+    bool operator<(const BusPath& other) {
+        return end_time < other.end_time;
+    }
+};
 
 struct Schedule {
     vector<vector<Route> > routes;
@@ -44,13 +44,13 @@ struct Schedule {
     void add_route(Route route) {
         routes[route.tail].push_back(route);
     };
+
 };
 
 TEST(DijkstraTest, Bus) {
     Schedule schedule(2);
     schedule.add_route(Route(0, 1, 5, 5, 3));
     auto solver = get_solver<Route, BusPath>(
-        std::bind(BusCmp, _1, _2),
         std::bind(&Schedule::get_routes, schedule, _1));
     solver.find_path(0, 1);
 }

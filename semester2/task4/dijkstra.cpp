@@ -43,19 +43,18 @@ struct GenericEdge {
  */
 
 template<typename Edge, typename Path,
-        typename _Cmp, typename _Get_edges> class DijkstraSolver {
+        typename _Get_edges> class DijkstraSolver {
     vector<VertexStruct<Path> > vertices;
     set<size_t, std::function<bool(size_t, size_t)>> queue;
     size_t start, end;
-    _Cmp cmp;
     _Get_edges get_edges;
 
     bool vertex_cmp(size_t a, size_t b) {
-        if (!(cmp(vertices[a].best_path, vertices[b].best_path) ||
-                cmp(vertices[b].best_path, vertices[a].best_path))) {
+        if (!(vertices[a].best_path < vertices[b].best_path ||
+                vertices[b].best_path < vertices[a].best_path)) {
             return a < b;
         }
-        return cmp(vertices[a].best_path, vertices[b].best_path);
+        return vertices[a].best_path < vertices[b].best_path;
     }
     
     void allocate(size_t v) {
@@ -84,7 +83,7 @@ template<typename Edge, typename Path,
         allocate(edge.head);
         Path new_path = vertices[edge.tail].best_path.extend(edge);
         if (target.state == NOT_VISITED ||
-                cmp(new_path, vertices[edge.head].best_path)) {
+                new_path < vertices[edge.head].best_path) {
             queue.erase(edge.head);
             target.state = VISITED;
             target.best_path = new_path;
@@ -94,8 +93,7 @@ template<typename Edge, typename Path,
     }
 
 public:
-    DijkstraSolver(_Cmp cmp, _Get_edges get_edges) :
-        cmp(cmp),
+    DijkstraSolver(_Get_edges get_edges) :
         get_edges(get_edges),
         queue(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2)) {}
 
@@ -121,10 +119,9 @@ public:
 };
 
 template<typename Edge, typename Path,
-    typename _Cmp, typename _Get_edges>
-    DijkstraSolver<Edge, Path, _Cmp, _Get_edges>
-            get_solver(_Cmp cmp, _Get_edges get_edges) {
-        return DijkstraSolver<Edge, Path,
-            _Cmp, _Get_edges>(cmp, get_edges);
+        typename _Get_edges>
+        DijkstraSolver<Edge, Path, _Get_edges>
+        get_solver(_Get_edges get_edges) {
+    return DijkstraSolver<Edge, Path, _Get_edges>(get_edges);
 }
 #endif

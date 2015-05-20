@@ -20,11 +20,11 @@ struct SimplePath {
     SimplePath extend(const SimpleEdge& edge) {
         return SimplePath(length + edge.weight);
     }
-};
 
-bool SimpleCmp(SimplePath& a, SimplePath& b) {
-    return a.length < b.length;
-}
+    bool operator<(const SimplePath& other) {
+        return length < other.length;
+    }
+};
 
 struct SimpleGraph {
     vector<vector<SimpleEdge> > edges;
@@ -53,7 +53,6 @@ TEST(DijkstraTest, Simple) {
     graph.add_edge(6, 5, 9);
     graph.add_edge(4, 5, 6);
     auto solver = get_solver<SimpleEdge, SimplePath>(
-        std::bind(SimpleCmp, _1, _2),
         std::bind(&SimpleGraph::get_edges, graph, _1));
     solver.find_path(1, 5);
 }

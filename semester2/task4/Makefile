@@ -75,7 +75,8 @@ gtest_main.a : gtest-all.o gtest_main.o
 # function.
 
 standard_application.o : dijkstra.cpp standard_application.cpp
+refuel.o : dijkstra.cpp refuel.cpp
 buses.o : dijkstra.cpp buses.cpp
 
-run_tests : standard_application.o buses.o gtest_main.a
+run_tests : standard_application.o buses.o refuel.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

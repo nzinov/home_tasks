@@ -50,6 +50,12 @@ struct Schedule {
 TEST(DijkstraTest, Bus) {
     Schedule schedule(2);
     schedule.add_route(Route(0, 1, 5, 5, 3));
+    1 1 2 4
+    2 0 2 0
+    3 2 2 2
+    3 2 1 3
+    1 1 2 2
+    2 0 1 1
     auto solver = get_solver<Route, BusPath>(
         std::bind(&Schedule::get_routes, schedule, _1));
     solver.find_path(0, 1);

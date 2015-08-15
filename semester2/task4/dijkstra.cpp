@@ -113,12 +113,18 @@ public:
         get_edges(get_edges),
         queue(std::bind(&DijkstraSolver::vertex_cmp, this, _1, _2)) {}
 
+    struct Answer {
+        Path best_path;
+        vector<size_t> vertices;
+
+        Answer(Path path, vector<size_t> vertices) : best_path(path), vertices(vertices) {}
+    };
     /*
      * arguments: vertices to find path between
      * returns: pair of the best Path between a and b and vector<size_t> of vertices on that path
      * throws: NoPathException if there is no path between a and b
      */
-    std::pair<Path, vector<size_t> > find_path(size_t a, size_t b) {
+    Answer find_path(size_t a, size_t b) {
         vertices.clear();
         queue.insert(a); 
         start = a;
@@ -138,7 +144,7 @@ public:
         if (vertices[b].state == NOT_VISITED) {
             throw NoPathException();
         }
-        return std::make_pair(vertices[b].best_path, get_path());
+        return Answer(vertices[b].best_path, get_path());
     }
 };
 

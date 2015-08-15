@@ -1,5 +1,6 @@
 #include "../googletest/include/gtest/gtest.h"
 #include <functional>
+#include <iostream>
 #include "dijkstra.cpp"
 
 using namespace std::placeholders;
@@ -7,8 +8,8 @@ using namespace std::placeholders;
 typedef long long cost_t;
 
 struct Road : GenericEdge {
-    vector<cost_t>& prices;
-    Road(size_t tail, size_t head, vector<cost_t>& prices) : GenericEdge(tail, head), prices(prices) {}
+    const vector<cost_t>& prices;
+    Road(size_t tail, size_t head, const vector<cost_t>& prices) : GenericEdge(tail, head), prices(prices) {}
 };
 
 struct Roadmap {
@@ -55,4 +56,7 @@ TEST(DijkstraTest, Refuel) {
     auto solver = get_solver<Road, Route>(
         std::bind(&Roadmap::get_edges, roadmap, _1));
     auto answer = solver.find_path(1, 5);
+    ASSERT_EQ(answer.best_path.cost, 4);
+    const vector<size_t> TEST_ANSWER = {1, 2, 4, 5}; 
+    EXPECT_TRUE(std::equal(TEST_ANSWER.begin(), TEST_ANSWER.end(), answer.vertices.begin()));
 }

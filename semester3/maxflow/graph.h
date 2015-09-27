@@ -6,22 +6,22 @@
 using std::vector;
 using std::list;
 
-unsigned INF = 1000000000;
-
 struct Edge;
 
 struct Vertex {
     unsigned excess;
     unsigned height;
-    size_t id;
-    vector<Edge>::iterator current_edge;
+    vector<Edge*> adjacent_edges;
+    vector<Edge*>::iterator current_edge;
 };
 
 struct Edge {
+    Vertex* tail;
+    Vertex* head;
     unsigned capacity;
     int flow;
     
-    Edge() : capacity(0), flow(0) {}
+    Edge(Vertex* tail, Vertex* head, unsigned capacity) : tail(tail), head(head), capacity(capacity), flow(0) {}
 
     unsigned extra_capacity() {
         assert(capacity - flow > 0);
@@ -35,15 +35,12 @@ struct Edge {
 
 class Graph {
     list<Vertex> vertices;
-    vector<vector<Edge>> edges;
+    vector<Edge> edges;
     list<Vertex>::iterator current_vertex;
 
-    Edge& get_edge(Vertex* tail, Vertex* head) {
-        return edges[tail->id][head->id];
-    }
-
     void add_edge(Vertex* tail, Vertex* head, unsigned capacity) {
-        get_edge(tail, head).capacity = capacity;
+        edges.emplace_back(tail, head, capacity);
+        tail->adjacent_edges.push_back(&edges);
     }
 
     void add_vertex() {

@@ -2,4 +2,4 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: cd semester2/task4 && make && make test
+script: cd semester3/maxflow && make test

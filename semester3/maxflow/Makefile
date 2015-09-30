@@ -1,0 +1,4 @@
+all:
+	true
+test:
+	true

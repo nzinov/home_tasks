@@ -15,6 +15,8 @@ struct Vertex {
     unsigned height;
     size_t id;
     vector<Edge>::iterator current_edge;
+    
+    Vertex(size_t id, vector<Edge>& edges) : id(id), current_edge(edges[id].begin()) {};
 };
 
 struct Edge {
@@ -47,11 +49,14 @@ class Graph {
     }
 
     void add_vertex() {
-        vertices.emplace_back(vertices.size());
+        vertices.emplace_back(vertices.size(), vertices);
     }
 
     void push(Vertex* source, Vertex* target) {
         Edge& edge = get_edge(source, target);
+        if (edge.extra_capacity() == 0 || source->height > target->height) { 
+            return;
+        }
         assert(source->excess > 0);
         assert(source->height == target->height + 1);
         assert(edge.extra_capacity() > 0);
@@ -75,8 +80,11 @@ class Graph {
 
     void discharge(Vertex* vertex) {
         while (vertex->excess > 0) {
-            if (current_vertex == vertices.end()) { 
+            if (vertex->current_edge == edges[vertex->id].end()) { 
+                relabel(vertex);
+                vertex->current_edge = edges[vertex->id].begin();
             }
+            push(vertex, &(vertex->current_edge->head));
         };
     }
 

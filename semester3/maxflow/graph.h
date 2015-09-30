@@ -9,27 +9,27 @@ typedef unsigned long size_t;
 using std::vector;
 using std::list;
 
-unsigned INF = 1000000000;
+int INF = 1000000000;
 
 struct Edge;
 
 struct Vertex {
-    unsigned excess;
-    unsigned height;
+    int excess;
+    int height;
     size_t current_neighbour;
     
     Vertex() : excess(0), height(0), current_neighbour(0) {};
 };
 
 struct Edge {
-    unsigned capacity;
+    int capacity;
     int flow;
     
     Edge() : capacity(0), flow(0) {}
 
-    unsigned extra_capacity() {
+    int extra_capacity() {
         assert(capacity - flow >= 0);
-        return static_cast<unsigned>(static_cast<int>(capacity) - flow);
+        return (capacity - flow);
     }
 
     bool is_open() {
@@ -38,7 +38,7 @@ struct Edge {
 
     void run_flow(int value) {
         flow += value;
-        assert(flow <= static_cast<int>(capacity));
+        assert(flow <= capacity);
     }
 };
 
@@ -63,14 +63,14 @@ class Network {
         assert(vertices[source].excess > 0);
         assert(vertices[source].height == vertices[target].height + 1);
         assert(edge.extra_capacity() > 0);
-        unsigned extra_flow = std::max(vertices[source].excess, edge.extra_capacity());
+        int extra_flow = std::max(vertices[source].excess, edge.extra_capacity());
         run_flow(source, target, extra_flow);
     }
 
     void relabel(size_t vertex) {
         std::cerr << "relabel(" << vertex << ")" << std::endl;
         assert(vertices[vertex].excess > 0);
-        unsigned lowest_height = INF;
+        int lowest_height = INF;
         for (size_t neighbour = 0; neighbour < vertices.size(); ++neighbour) {
             if (edges[vertex][neighbour].is_open()) {
                 lowest_height = std::min(lowest_height, vertices[neighbour].height);
@@ -133,11 +133,11 @@ public:
         return &edges[tail][head];
     }
 
-    unsigned find_flow() {
+    int find_flow() {
         generate_flow();
-        unsigned flow = 0;
+        int flow = 0;
         for (size_t vertex = 1; vertex < vertices.size(); ++vertex) {
-            flow += static_cast<unsigned>(edges[0][vertex].flow);
+            flow += edges[0][vertex].flow;
         }
         return flow;
     }

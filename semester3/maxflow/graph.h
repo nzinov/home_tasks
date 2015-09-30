@@ -91,8 +91,10 @@ class Graph {
         vertices[vertex].height = lowest_height + 1;
     }
 
-    void discharge(size_t vertex) {
+    bool discharge(size_t vertex) {
+        bool updated = false;
         while (vertices[vertex].excess > 0) {
+            updated = true;
             if (vertices[vertex].current_neighbour == vertices.size()) { 
                 relabel(vertex);
                 vertices[vertex].current_neighbour = 0;
@@ -100,7 +102,19 @@ class Graph {
             push(vertex, vertices[vertex].current_neighbour);
             ++vertices[vertex].current_neighbour;
         };
+        return updated;
     }
 
+    void find_flow() {
+        bool found = false;
+        while (!found) {
+            found = true;
+            for (size_t vertex = 0; vertex < vertices.size(); ++vertex) {
+                if (discharge(vertex)) {
+                    found = false;
+                }
+            }
+        }
+    }
 };
 

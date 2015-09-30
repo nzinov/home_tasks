@@ -40,7 +40,7 @@ struct Edge {
     }
 };
 
-class Graph {
+class Network {
     vector<Vertex> vertices;
     vector<vector<Edge> > edges;
     list<Vertex>::iterator current_vertex;
@@ -106,16 +106,17 @@ class Graph {
     }
 
 public:
-    Graph(size_t vertex_number)
+    Network(size_t vertex_number)
         : vertices(vertex_number), edges(vertex_number, vector<Edge>(vertex_number)) {
             vertices.front().height = vertex_number;
     }
 
-    void add_edge(size_t tail, size_t head, unsigned capacity) {
+    Edge* add_edge(size_t tail, size_t head, unsigned capacity) {
         edges[tail][head].capacity = capacity;
         if (is_out(head)) {
             edges[tail][head].run_flow(capacity);
         } 
+        return &edges[tail][head];
     }
 
     unsigned find_flow() {

@@ -42,13 +42,8 @@ struct Edge {
 
 class Graph {
     vector<Vertex> vertices;
-    vector<vector<Edge>> edges;
+    vector<vector<Edge> > edges;
     list<Vertex>::iterator current_vertex;
-
-    Graph(size_t vertex_number)
-        : vertices(vertex_number), edges(vertex_number, vector<Edge>(vertex_number)) {
-        vertices.front().height = vertex_number;
-    }
 
     inline bool is_out(size_t vertex) {
         return vertex == vertices.size() - 1;
@@ -57,13 +52,6 @@ class Graph {
     void run_flow(size_t from, size_t to, int value) {
         edges[from][to].run_flow(value);
         edges[to][from].run_flow(-value);
-    }
-
-    void add_edge(size_t tail, size_t head, unsigned capacity) {
-        edges[tail][head].capacity = capacity;
-        if (is_out(head)) {
-            edges[tail][head].run_flow(capacity);
-        } 
     }
 
     void push(size_t source, size_t target) {
@@ -105,7 +93,7 @@ class Graph {
         return updated;
     }
 
-    void find_flow() {
+    void generate_flow() {
         bool found = false;
         while (!found) {
             found = true;
@@ -115,6 +103,28 @@ class Graph {
                 }
             }
         }
+    }
+
+public:
+    Graph(size_t vertex_number)
+        : vertices(vertex_number), edges(vertex_number, vector<Edge>(vertex_number)) {
+            vertices.front().height = vertex_number;
+    }
+
+    void add_edge(size_t tail, size_t head, unsigned capacity) {
+        edges[tail][head].capacity = capacity;
+        if (is_out(head)) {
+            edges[tail][head].run_flow(capacity);
+        } 
+    }
+
+    unsigned find_flow() {
+        generate_flow();
+        unsigned flow = 0;
+        for (size_t vertex = 1; vertex < vertices.size(); ++vertex) {
+            flow += static_cast<unsigned>(edges[0][vertex].flow);
+        }
+        return flow;
     }
 };
 

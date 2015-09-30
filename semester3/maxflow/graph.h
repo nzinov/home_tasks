@@ -9,16 +9,15 @@ typedef unsigned long size_t;
 using std::vector;
 using std::list;
 
-int INF = 1000000000;
+int INF = 1000000;
 
 struct Edge;
 
 struct Vertex {
     int excess;
     int height;
-    size_t current_neighbour;
     
-    Vertex() : excess(0), height(0), current_neighbour(0) {};
+    Vertex() : excess(0), height(0) {};
 };
 
 struct Edge {
@@ -63,7 +62,7 @@ class Network {
         assert(vertices[source].excess > 0);
         assert(vertices[source].height == vertices[target].height + 1);
         assert(edge.extra_capacity() > 0);
-        int extra_flow = std::max(vertices[source].excess, edge.extra_capacity());
+        int extra_flow = std::min(vertices[source].excess, edge.extra_capacity());
         run_flow(source, target, extra_flow);
     }
 
@@ -83,14 +82,15 @@ class Network {
     bool discharge(size_t vertex) {
         std::cerr << "discharge(" << vertex << ")" << std::endl;
         bool updated = false;
+        size_t current_neighbour = 0;
         while (vertices[vertex].excess > 0) {
             updated = true;
-            if (vertices[vertex].current_neighbour == vertices.size()) { 
+            if (current_neighbour == vertices.size()) { 
                 relabel(vertex);
-                vertices[vertex].current_neighbour = 0;
+                current_neighbour = 0;
             }
-            push(vertex, vertices[vertex].current_neighbour);
-            ++vertices[vertex].current_neighbour;
+            push(vertex, current_neighbour);
+            ++current_neighbour;
         };
         return updated;
     }

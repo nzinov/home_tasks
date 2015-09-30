@@ -9,24 +9,24 @@ typedef unsigned long size_t;
 using std::vector;
 using std::list;
 
-int INF = 1000000;
+long long INF = 1000000;
 
 struct Edge;
 
 struct Vertex {
-    int excess;
-    int height;
+    long long excess;
+    long long height;
     
     Vertex() : excess(0), height(0) {};
 };
 
 struct Edge {
-    int capacity;
-    int flow;
+    long long capacity;
+    long long flow;
     
     Edge() : capacity(0), flow(0) {}
 
-    int extra_capacity() {
+    long long extra_capacity() {
         assert(capacity - flow >= 0);
         return (capacity - flow);
     }
@@ -35,7 +35,7 @@ struct Edge {
         return extra_capacity() > 0;
     }
 
-    void run_flow(int value) {
+    void run_flow(long long value) {
         flow += value;
         assert(flow <= capacity);
     }
@@ -46,7 +46,7 @@ class Network {
     vector<vector<Edge> > edges;
     list<Vertex>::iterator current_vertex;
 
-    void run_flow(size_t from, size_t to, int value) {
+    void run_flow(size_t from, size_t to, long long value) {
         edges[from][to].run_flow(value);
         edges[to][from].run_flow(-value);
         vertices[from].excess -= value;
@@ -62,14 +62,14 @@ class Network {
         assert(vertices[source].excess > 0);
         assert(vertices[source].height == vertices[target].height + 1);
         assert(edge.extra_capacity() > 0);
-        int extra_flow = std::min(vertices[source].excess, edge.extra_capacity());
+        long long extra_flow = std::min(vertices[source].excess, edge.extra_capacity());
         run_flow(source, target, extra_flow);
     }
 
     void relabel(size_t vertex) {
         std::cerr << "relabel(" << vertex << ")" << std::endl;
         assert(vertices[vertex].excess > 0);
-        int lowest_height = INF;
+        long long lowest_height = INF;
         for (size_t neighbour = 0; neighbour < vertices.size(); ++neighbour) {
             if (edges[vertex][neighbour].is_open()) {
                 lowest_height = std::min(lowest_height, vertices[neighbour].height);
@@ -133,9 +133,9 @@ public:
         return &edges[tail][head];
     }
 
-    int find_flow() {
+    long long find_flow() {
         generate_flow();
-        int flow = 0;
+        long long flow = 0;
         for (size_t vertex = 1; vertex < vertices.size(); ++vertex) {
             flow += edges[0][vertex].flow;
         }

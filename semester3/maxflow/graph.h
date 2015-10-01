@@ -26,16 +26,16 @@ struct Edge {
     
     Edge() : capacity(0), flow(0) {}
 
-    long long extra_capacity() {
+    inline long long extra_capacity() {
         assert(capacity - flow >= 0);
         return (capacity - flow);
     }
 
-    bool is_open() {
+    inline bool is_open() {
         return extra_capacity() > 0;
     }
 
-    void run_flow(long long value) {
+    inline void run_flow(long long value) {
         flow += value;
         assert(flow <= capacity);
     }

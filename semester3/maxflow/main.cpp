@@ -13,7 +13,7 @@ int main() {
         edges.push_back(graph.add_edge(tail - 1, head - 1, capacity));
     }
     std::cout << graph.find_flow() << std::endl;
-    for (Edge* edge : edges) {
-        std::cout << edge->flow << std::endl;
+    for (size_t i = 0; i < edges.size(); ++i) {
+        std::cout << edges[i]->flow << std::endl;
     }
 }

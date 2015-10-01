@@ -137,7 +137,7 @@ struct EdgePart {
     EdgePart(Edge* edge, long long capacity) : edge(edge), capacity(capacity) {}
     
     long long flow() {
-        long long flow = std::min(capacity, edge->flow);
+        long long flow = std::max(0LL, std::min(capacity, edge->flow));
         edge->flow -= flow;
         return flow;
     }

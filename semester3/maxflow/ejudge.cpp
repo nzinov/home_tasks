@@ -113,7 +113,7 @@ public:
     }
 
     Edge* add_edge(size_t tail, size_t head, unsigned capacity) {
-        edges[tail][head].capacity = capacity;
+        edges[tail][head].capacity += capacity;
         if (tail == 0) {
             run_flow(tail, head, capacity);
         } 
@@ -130,19 +130,32 @@ public:
     }
 };
 
+struct EdgePart {
+    Edge* edge;
+    long long capacity;
+
+    EdgePart(Edge* edge, long long capacity) : edge(edge), capacity(capacity) {}
+    
+    long long flow() {
+        long long flow = std::min(capacity, edge->flow);
+        edge->flow -= flow;
+        return flow;
+    }
+};
+
 int main() {
     size_t vertex_count, edge_count;
     scanf("%lu %lu", &vertex_count, &edge_count);
     Network graph(vertex_count);
-    vector<Edge*> edges;
+    vector<EdgePart> edges;
     edges.reserve(edge_count);
     for (size_t i = 0; i < edge_count; ++i) {
         size_t tail, head, capacity;
         scanf("%lu %lu %lu", &tail, &head, &capacity);
-        edges.push_back(graph.add_edge(tail - 1, head - 1, capacity));
+        edges.push_back(EdgePart(graph.add_edge(tail - 1, head - 1, capacity), capacity));
     }
     printf("%llu\n", graph.find_flow());
     for (size_t i = 0; i < edges.size(); ++i) {
-        printf("%llu\n", edges[i]->flow);
+        printf("%llu\n", edges[i].flow());
     }
 }

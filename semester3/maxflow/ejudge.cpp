@@ -1,7 +1,6 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
-#include <iostream>
 
 typedef unsigned long size_t;
 using std::vector;
@@ -42,12 +41,10 @@ class Network {
 
     inline void set_height(size_t vertex, long long height) {
         long long prev_height = vertices[vertex].height;
-        std::cerr << prev_height << ' ' << height << std::endl;
         vertices[vertex].height = height;
         heights[prev_height]--;
         heights[height]++;
         if (heights[prev_height] == 0) {
-            std::cerr << "raise" << prev_height;
             for (size_t v = 0; v < vertices.size(); ++v) {
                 if (vertices[v].height > prev_height) {
                     vertices[v].height = vertices.size();
@@ -83,8 +80,7 @@ class Network {
                 lowest_height = std::min(lowest_height, vertices[neighbour].height);
             }
         }
-        //set_height(vertex, lowest_height + 1);
-        vertices[vertex].height =  lowest_height + 1;
+        set_height(vertex, lowest_height + 1);
     }
 
     inline bool discharge(size_t vertex) {
@@ -96,6 +92,7 @@ class Network {
                 vertices[vertex].current = 0;
             }
             push(vertex, vertices[vertex].current);
+            vertices[vertex].current++;
         };
         return updated;
     }

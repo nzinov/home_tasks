@@ -14,6 +14,7 @@ struct Vertex {
     long long excess;
     long long height;
     size_t current;
+    vector<size_t> neighbours;
     
     Vertex() : excess(0), height(0), current(0) {};
 };
@@ -75,9 +76,9 @@ class Network {
 
     inline void relabel(size_t vertex) {
         long long lowest_height = INF;
-        for (size_t neighbour = 0; neighbour < vertices.size(); ++neighbour) {
-            if (edges[vertex][neighbour].is_open()) {
-                lowest_height = std::min(lowest_height, vertices[neighbour].height);
+        for (size_t i = 0; i < vertices[vertex].neighbours.size(); ++i) {
+            if (edges[vertex][vertices[vertex].neighbours[i]].is_open()) {
+                lowest_height = std::min(lowest_height, vertices[vertices[vertex].neighbours[i]].height);
             }
         }
         set_height(vertex, lowest_height + 1);
@@ -114,6 +115,8 @@ public:
 
     Edge* add_edge(size_t tail, size_t head, unsigned capacity) {
         edges[tail][head].capacity += capacity;
+        vertices[tail].neighbours.push_back(head);
+        vertices[head].neighbours.push_back(tail);
         if (tail == 0) {
             run_flow(tail, head, capacity);
         } 

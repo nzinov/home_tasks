@@ -34,7 +34,7 @@ struct Edge {
     }
 };
 
-class Network {
+struct Network {
     vector<Vertex> vertices;
     vector<vector<Edge> > edges;
     queue<size_t> q;
@@ -160,5 +160,8 @@ int main() {
     printf("%llu\n", graph.find_flow());
     for (size_t i = 0; i < edges.size(); ++i) {
         printf("%llu\n", edges[i].flow());
+    }
+    for (Vertex v : graph.vertices) {
+        printf("%llu ", v.height);
     }
 }

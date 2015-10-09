@@ -38,20 +38,9 @@ struct Network {
     vector<Vertex> vertices;
     vector<vector<Edge> > edges;
     queue<size_t> q;
-    vector<size_t> heights;
 
     inline void set_height(size_t vertex, long long height) {
-        long long prev_height = vertices[vertex].height;
         vertices[vertex].height = height;
-        heights[prev_height]--;
-        heights[height]++;
-        if (heights[prev_height] == 0) {
-            for (size_t v = 0; v < vertices.size(); ++v) {
-                if (vertices[v].height > prev_height) {
-                    vertices[v].height = vertices.size();
-                }
-            }
-        }
     }
 
     inline void run_flow(size_t from, size_t to, long long value) {
@@ -107,10 +96,8 @@ struct Network {
 
 public:
     Network(size_t vertex_number)
-        : vertices(vertex_number), edges(vertex_number, vector<Edge>(vertex_number)), heights(2000) {
+        : vertices(vertex_number), edges(vertex_number, vector<Edge>(vertex_number)) {
             vertices.front().height = vertex_number;
-            heights[0] = vertex_number - 1;
-            heights[vertex_number] = 1;
     }
 
     Edge* add_edge(size_t tail, size_t head, unsigned capacity) {

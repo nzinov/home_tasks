@@ -138,7 +138,7 @@ struct EdgePart {
     long long capacity;
 
     EdgePart(Edge* edge, long long capacity) : edge(edge), capacity(capacity) {}
-    
+
     long long flow() {
         long long flow = std::max(0LL, std::min(capacity, edge->flow));
         edge->flow -= flow;
@@ -148,17 +148,17 @@ struct EdgePart {
 
 int main() {
     size_t vertex_count, edge_count;
-    scanf("%lu %lu", &vertex_count, &edge_count);
+    std::cin >> vertex_count >> edge_count;
     Network graph(vertex_count);
-    vector<EdgePart> edges;
+    vector<Edge*> edges;
     edges.reserve(edge_count);
     for (size_t i = 0; i < edge_count; ++i) {
         size_t tail, head, capacity;
-        scanf("%lu %lu %lu", &tail, &head, &capacity);
-        edges.push_back(EdgePart(graph.add_edge(tail - 1, head - 1, capacity), capacity));
+        std::cin >> tail >> head >> capacity;
+        edges.push_back(graph.add_edge(tail - 1, head - 1, capacity));
     }
-    printf("%llu\n", graph.find_flow());
+    std::cout << graph.find_flow() << std::endl;
     for (size_t i = 0; i < edges.size(); ++i) {
-        printf("%llu\n", edges[i].flow());
+        std::cout << edges[i]->flow << std::endl;
     }
 }

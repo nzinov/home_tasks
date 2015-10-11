@@ -1,6 +1,6 @@
 bin/main: main.cpp graph.h
 	mkdir -p bin;
-	g++ main.cpp -g --std=c++0x -o bin/main
+	g++ main.cpp graph.cpp -g --std=c++0x -o bin/main
 test: bin/main
 	bin/main
 debug: bin/main

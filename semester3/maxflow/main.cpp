@@ -1,24 +1,12 @@
 #include "graph.h"
+#include <vector>
 #include <iostream>
-
-struct EdgePart {
-    Edge* edge;
-    long long capacity;
-
-    EdgePart(Edge* edge, long long capacity) : edge(edge), capacity(capacity) {}
-
-    long long flow() {
-        long long flow = std::max(0LL, std::min(capacity, edge->flow));
-        edge->flow -= flow;
-        return flow;
-    }
-};
 
 int main() {
     size_t vertex_count, edge_count;
     std::cin >> vertex_count >> edge_count;
     Network graph(vertex_count);
-    vector<Edge*> edges;
+    std::vector<Edge*> edges;
     edges.reserve(edge_count);
     for (size_t i = 0; i < edge_count; ++i) {
         size_t tail, head, capacity;

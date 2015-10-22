@@ -15,7 +15,6 @@ struct Vertex {
     long long height;
     size_t current;
     std::vector<size_t> neighbours;
-    
     Vertex();
 };
 

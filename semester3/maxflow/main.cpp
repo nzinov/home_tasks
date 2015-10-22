@@ -1,20 +1,17 @@
-#include "graph.h"
 #include <vector>
 #include <iostream>
+#include <QApplication>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include "graph.h"
 
-int main() {
-    size_t vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
-    Network graph(vertex_count);
-    std::vector<Edge*> edges;
-    edges.reserve(edge_count);
-    for (size_t i = 0; i < edge_count; ++i) {
-        size_t tail, head, capacity;
-        std::cin >> tail >> head >> capacity;
-        edges.push_back(graph.add_edge(tail - 1, head - 1, capacity));
-    }
-    std::cout << graph.find_flow() << std::endl;
-    for (size_t i = 0; i < edges.size(); ++i) {
-        std::cout << edges[i]->flow << std::endl;
-    }
+int main(int argc, char** argv) {
+    QApplication app(argc, argv);
+    QGraphicsScene scene;
+    scene.addText("Hello, world!");
+
+    QGraphicsView view(&scene);
+    view.show();
+
+    return app.exec();
 }

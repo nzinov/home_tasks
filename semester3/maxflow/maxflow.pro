@@ -8,4 +8,5 @@ INCLUDEPATH += .
 QT += widgets 
 
 # Input
-SOURCES += test.cpp
+SOURCES += graph.cpp main.cpp
+HEADERS += graph.h

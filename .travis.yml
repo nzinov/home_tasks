@@ -2,4 +2,4 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: cd semester3/maxflow && make test
+script: true

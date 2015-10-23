@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = bin/maxflow
 INCLUDEPATH += .
 QT += widgets 
+CONFIG += c++11 c++14
 
 # Input
 SOURCES += graph.cpp main.cpp

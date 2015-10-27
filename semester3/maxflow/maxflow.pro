@@ -9,5 +9,5 @@ QT += widgets
 CONFIG += c++11 c++14
 
 # Input
-SOURCES += graph.cpp main.cpp
-HEADERS += graph.h
+SOURCES += graph.cpp main.cpp log.cpp visualization.cpp
+HEADERS += graph.h log.h action.h 

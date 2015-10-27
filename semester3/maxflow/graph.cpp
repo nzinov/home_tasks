@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <queue>
 #include "graph.h"
+#include "log.h"
 
 using std::vector;
 using std::queue;
@@ -27,6 +28,7 @@ inline void Network::set_height(size_t vertex, long long height) {
     heights[prev_height]--;
     heights[height]++;
     if (heights[prev_height] == 0) {
+        log->add(Action(Gap{prev_height}), *this);
         for (size_t v = 0; v < vertices.size(); ++v) {
             if (vertices[v].height > prev_height) {
                 vertices[v].height = vertices.size();
@@ -54,11 +56,13 @@ inline void Network::push(size_t source, size_t target) {
     assert(vertices[source].excess > 0);
     assert(vertices[source].height == vertices[target].height + 1);
     assert(edge.extra_capacity() > 0);
+    log->add(Action(Push{source, target}), *this);
     long long extra_flow = std::min(vertices[source].excess, edge.extra_capacity());
     run_flow(source, target, extra_flow);
 }
 
 inline void Network::relabel(size_t vertex) {
+    log->add(Action(Relabel{vertex}), *this);
     long long lowest_height = INF;
     for (size_t i = 0; i < vertices[vertex].neighbours.size(); ++i) {
         if (edges[vertex][vertices[vertex].neighbours[i]].is_open()) {
@@ -89,8 +93,11 @@ void Network::generate_flow() {
     }
 }
 
-Network::Network(size_t vertex_number)
-    : vertices(vertex_number), edges(vertex_number, vector<Edge>(vertex_number)), heights(vertex_number*2 + 1) {
+Network::Network(size_t vertex_number, Log *log) :
+    vertices(vertex_number),
+    edges(vertex_number, vector<Edge>(vertex_number)),
+    heights(vertex_number*2 + 1),
+    log(log) {
         vertices.front().height = vertex_number;
         heights[0] = vertex_number - 1;
         heights[vertex_number] = 1;

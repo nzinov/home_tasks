@@ -8,11 +8,11 @@
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
-    QGraphicsScene scene;
+    GraphScene scene;
     Vertex v;
     v.height = 5;
-    VisualVertex vertex(nullptr, &v);
-    scene.addItem(&vertex);
+    VisualVertex vertex(&v);
+    scene.addShadowedItem(&vertex);
 
     QGraphicsView view(&scene);
     view.show();

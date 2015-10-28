@@ -1,113 +1,81 @@
-#include <QGraphicsItem>
-#include <QGraphicsScene>
-#include <QGraphicsLineItem>
-#include <QGraphicsEllipseItem>
-#include <QGraphicsSimpleTextItem>
-#include <QGraphicsWidget>
 #include <QRectF>
 #include <QBrush>
+#include <QPainter>
 #include <Qt>
+#include <QWidget>
 #include "graph.h"
 
-const qreal VERTEX_RADIUS = 5;
+const int VERTEX_RADIUS = 5;
 const int HEIGHT_MULTIPLIER = 1;
 
-class ShadowedGraphicsItem;
-class Shadow : public QGraphicsItem {
+class ShadowedGraphicsElement {
 public:
-    ShadowedGraphicsItem* owner = 0;
-
-    Shadow(ShadowedGraphicsItem *owner) : owner(owner) {}
-    void updatePos();
-    virtual QRectF boundingRect() const;
-    virtual void paint(QPainter *painter,
-            const QStyleOptionGraphicsItem*,
-            QWidget*);
+    virtual void paint(QPainter* painter) = 0;
+    virtual void paintShadow(QPainter* painter) = 0;
 };
 
-class ShadowedGraphicsItem : public QGraphicsItem {
-    Shadow shadow;
-public:
-    ShadowedGraphicsItem() : shadow{this} {}
-    QGraphicsItem* getShadow() {
-        return &shadow;
-    };
+class ShadedCanvas : public QWidget {
+    std::vector<ShadowedGraphicsElement*> elements;
 
-    virtual QRectF shadowBoundingRect() const = 0;
-    virtual void paintShadow(QPainter *painter) = 0;
-};
-
-void Shadow::updatePos() {
-    setPos(owner->pos());
-}
-
-QRectF Shadow::boundingRect() const {
-    const_cast<Shadow*>(this)->updatePos();
-    return owner->shadowBoundingRect();
-}
-
-void Shadow::paint(QPainter *painter,
-        const QStyleOptionGraphicsItem*,
-        QWidget*) {
-    updatePos();
-    owner->paintShadow(painter);
-}
-
-class GraphScene : public QGraphicsScene {
-    QGraphicsWidget radiant_layer;
-    QGraphicsWidget shadow_layer;
-
-public:
-    GraphScene() {
-        addItem(&shadow_layer);
-        addItem(&radiant_layer);
+    public:
+    virtual void paintEvent(QPaintEvent*) {
+        QPainter painter(this);
+        for (auto element : elements) {
+            element->paintShadow(&painter);
+        }
+        for (auto element : elements) {
+            element->paint(&painter);
+        }
     }
 
-    void addShadowedItem(ShadowedGraphicsItem* item) {
-        item->setParentItem(&radiant_layer);
-        QGraphicsItem* shadow = item->getShadow();
-        shadow->setParentItem(&shadow_layer);
-        addItem(item);
-        addItem(shadow);
+    void addElement(ShadowedGraphicsElement* element) {
+        elements.push_back(element);
     }
 };
 
+class VisualVertex : public ShadowedGraphicsElement {
+    QPoint position;
+    Vertex* wrappedVertex;
 
-class VisualVertex : public ShadowedGraphicsItem {
 public:
-    Vertex *wrapped_vertex;
+    VisualVertex(Vertex* vertex) : wrappedVertex(vertex) {};
 
-    VisualVertex(Vertex *wrapped_vertex) :
-            wrapped_vertex(wrapped_vertex) {
-        setX(50);
-        setY(50);
+    QPoint position() {
+        return position;
     }
 
-    int height() const {
-        return wrapped_vertex->height * HEIGHT_MULTIPLIER;
+    QPoint shadowPosition() {
+        return position + QPoint(height(), height());
     }
 
-    QPointF shadowShift() const {
-        return QPointF(height(), height());
+    int height() {
+        return wrappedVertex->height*HEIGHT_MULTIPLIER;
     }
 
-    virtual void paint(QPainter *painter,
-            const QStyleOptionGraphicsItem*,
-            QWidget*) {
+    virtual void paint(QPainter* painter) {
         painter->setBrush(Qt::red);
-        painter->drawEllipse(boundingRect());
+        painter->drawEllipse(position, VERTEX_RADIUS, VERTEX_RADIUS);
     }
 
-    virtual void paintShadow(QPainter *painter) {
+    virtual void paintShadow(QPainter* painter) {
         painter->setBrush(Qt::gray);
-        painter->drawEllipse(shadowBoundingRect());
-    }
-
-    virtual QRectF boundingRect() const {
-        return QRectF(-VERTEX_RADIUS, -VERTEX_RADIUS, 2*VERTEX_RADIUS, 2*VERTEX_RADIUS);
-    }
-
-    virtual QRectF shadowBoundingRect() const {
-        return boundingRect().translated(shadowShift());
+        painter->drawEllipse(shadowPosition(), VERTEX_RADIUS, VERTEX_RADIUS);
     }
 };
+
+class VisualEdge : public ShadowedGraphicsElement {
+    VisualVertex* tail;
+    VisualVertex* head;
+
+public:
+    virtual void paint(QPainter* painter) {
+        painter->setPen(Qt::black);
+        painter->drawLine(tail->position(), head->position());
+    }
+
+    virtual void paintShadow(QPainter* painter) {
+        painter->setPen(Qt::gray);
+        painter->drawLine(tail->shadowPosition(), head->shadowPosition());
+    }
+};
+

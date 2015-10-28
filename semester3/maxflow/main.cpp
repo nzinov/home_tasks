@@ -8,14 +8,12 @@
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
-    GraphScene scene;
+    ShadedCanvas canvas;
     Vertex v;
     v.height = 5;
     VisualVertex vertex(&v);
-    scene.addShadowedItem(&vertex);
-
-    QGraphicsView view(&scene);
-    view.show();
+    canvas.addElement(&vertex);
+    canvas.show();
 
     return app.exec();
 }

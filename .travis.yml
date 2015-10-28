@@ -1,10 +1,12 @@
 language: cpp
+cache:
+    apt
 addon:
     apt:
         sources:
-            ppa:ubuntu-sdk-team/ppa
+            - ppa:ubuntu-sdk-team/ppa
         packages:
-            qtbase5-dev
+            - qtbase5-dev
 compiler:
   - gcc
 script:

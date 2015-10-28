@@ -1,10 +1,10 @@
 language: cpp
 cache:
     apt
-addon:
+addons:
     apt:
         sources:
-            - ppa:ubuntu-sdk-team/ppa
+            - ubuntu-sdk-team
         packages:
             - qtbase5-dev
 compiler:

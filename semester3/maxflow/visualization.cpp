@@ -14,12 +14,12 @@ const int HEIGHT_MULTIPLIER = 1;
 
 class ShadowedGraphicsItem;
 class Shadow : public QGraphicsItem {
-public: 
+public:
     ShadowedGraphicsItem* owner = 0;
 
     Shadow(ShadowedGraphicsItem *owner) : owner(owner) {}
+    void updatePos();
     virtual QRectF boundingRect() const;
-
     virtual void paint(QPainter *painter,
             const QStyleOptionGraphicsItem*,
             QWidget*);
@@ -37,13 +37,19 @@ public:
     virtual void paintShadow(QPainter *painter) = 0;
 };
 
+void Shadow::updatePos() {
+    setPos(owner->pos());
+}
+
 QRectF Shadow::boundingRect() const {
+    const_cast<Shadow*>(this)->updatePos();
     return owner->shadowBoundingRect();
 }
 
 void Shadow::paint(QPainter *painter,
         const QStyleOptionGraphicsItem*,
         QWidget*) {
+    updatePos();
     owner->paintShadow(painter);
 }
 
@@ -53,8 +59,8 @@ class GraphScene : public QGraphicsScene {
 
 public:
     GraphScene() {
-        addItem(&radiant_layer);
         addItem(&shadow_layer);
+        addItem(&radiant_layer);
     }
 
     void addShadowedItem(ShadowedGraphicsItem* item) {
@@ -71,7 +77,7 @@ class VisualVertex : public ShadowedGraphicsItem {
 public:
     Vertex *wrapped_vertex;
 
-    VisualVertex(Vertex *wrapped_vertex) : 
+    VisualVertex(Vertex *wrapped_vertex) :
             wrapped_vertex(wrapped_vertex) {
         setX(50);
         setY(50);

@@ -45,7 +45,7 @@ class Network {
     void generate_flow();
 
 public:
-    Network(size_t vertex_number, Log *log);
+    Network(size_t vertex_number, Log *log = nullptr);
     Edge* add_edge(size_t tail, size_t head, unsigned capacity);
     long long find_flow();
 };

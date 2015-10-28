@@ -1,6 +1,11 @@
 language: cpp
+addon:
+    apt:
+        packages:
+            qtbase5-dev
 compiler:
   - gcc
 script:
   - cd semester3/maxflow
+    qmake
   - make

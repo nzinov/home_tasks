@@ -1,6 +1,8 @@
 language: cpp
 addon:
     apt:
+        sources:
+            ppa:ubuntu-sdk-team/ppa
         packages:
             qtbase5-dev
 compiler:

@@ -7,5 +7,5 @@ compiler:
   - gcc
 script:
   - cd semester3/maxflow
-  - qmake
+  - qmake -qt=qt5
   - make

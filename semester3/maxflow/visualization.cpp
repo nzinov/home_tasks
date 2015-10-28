@@ -34,17 +34,18 @@ class ShadedCanvas : public QWidget {
 };
 
 class VisualVertex : public ShadowedGraphicsElement {
+public:
     QPoint position;
     Vertex* wrappedVertex;
 
 public:
     VisualVertex(Vertex* vertex) : wrappedVertex(vertex) {};
 
-    QPoint position() {
+    QPoint getPosition() {
         return position;
     }
 
-    QPoint shadowPosition() {
+    QPoint getShadowPosition() {
         return position + QPoint(height(), height());
     }
 
@@ -59,23 +60,24 @@ public:
 
     virtual void paintShadow(QPainter* painter) {
         painter->setBrush(Qt::gray);
-        painter->drawEllipse(shadowPosition(), VERTEX_RADIUS, VERTEX_RADIUS);
+        painter->drawEllipse(getShadowPosition(), VERTEX_RADIUS, VERTEX_RADIUS);
     }
 };
 
 class VisualEdge : public ShadowedGraphicsElement {
+public:
     VisualVertex* tail;
     VisualVertex* head;
 
 public:
     virtual void paint(QPainter* painter) {
         painter->setPen(Qt::black);
-        painter->drawLine(tail->position(), head->position());
+        painter->drawLine(tail->getPosition(), head->getPosition());
     }
 
     virtual void paintShadow(QPainter* painter) {
         painter->setPen(Qt::gray);
-        painter->drawLine(tail->shadowPosition(), head->shadowPosition());
+        painter->drawLine(tail->getShadowPosition(), head->getShadowPosition());
     }
 };
 

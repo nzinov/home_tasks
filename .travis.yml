@@ -1,4 +1,6 @@
 language: cpp
 compiler:
   - gcc
-script: cd semester3/maxflow && make
+script:
+  - cd semester3/maxflow
+  - make

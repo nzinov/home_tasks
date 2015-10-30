@@ -26,7 +26,7 @@ struct Edge {
     
     Edge();
 
-    inline long long extra_capacity();
+    inline long long extra_capacity() const;
     inline bool is_open();
 };
 

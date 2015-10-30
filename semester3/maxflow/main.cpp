@@ -16,7 +16,9 @@ int main(int argc, char** argv) {
     VisualVertex uertex(1, network);
     uertex.position = QPoint(200, 500);
     VisualEdge edge(&uertex, &vertex, network);
+    VisualEdge edge2(&vertex, &uertex, network);
     canvas.addEdge(edge);
+    canvas.addEdge(edge2);
     canvas.addVertex(vertex);
     canvas.addVertex(uertex);
     canvas.updateNetwork(network);

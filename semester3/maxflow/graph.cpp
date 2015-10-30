@@ -98,6 +98,9 @@ Network::Network(size_t vertex_number, Log *log) :
     edges(vertex_number, vector<Edge>(vertex_number)),
     heights(vertex_number*2 + 1),
     log(log) {
+        if (vertex_number == 0) {
+            return;
+        }
         vertices.front().height = vertex_number;
         heights[0] = vertex_number - 1;
         heights[vertex_number] = 1;
@@ -122,3 +125,10 @@ long long Network::find_flow() {
     return flow;
 }
 
+const Vertex* Network::get_vertex(size_t id) const {
+    return &vertices[id];
+}
+
+const Edge* Network::get_edge(size_t tail, size_t head) const {
+    return &edges[tail][head];
+}

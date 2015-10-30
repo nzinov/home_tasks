@@ -8,20 +8,18 @@
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
-    ShadedCanvas canvas;
-    Vertex v, u;
-    v.height = 5;
-    u.height = 15;
-    VisualVertex vertex(&v);
+    Visualization canvas;
+    Network network(2);
+    network.add_edge(1, 0, 1);
+    VisualVertex vertex(0, network);
     vertex.position = QPoint(100, 100);
-    VisualVertex uertex(&u);
+    VisualVertex uertex(1, network);
     uertex.position = QPoint(200, 500);
-    VisualEdge edge;
-    edge.head = &vertex;
-    edge.tail = &uertex;
-    canvas.addElement(&edge);
-    canvas.addElement(&vertex);
-    canvas.addElement(&uertex);
+    VisualEdge edge(&uertex, &vertex, network);
+    canvas.addEdge(edge);
+    canvas.addVertex(vertex);
+    canvas.addVertex(uertex);
+    canvas.updateNetwork(network);
     canvas.show();
 
     return app.exec();

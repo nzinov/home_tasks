@@ -3,7 +3,7 @@
 
 class GraphReader {
 public:
-    Network read() {
+    static Network read() {
         size_t vertex_count, edge_count;
         std::cin >> vertex_count >> edge_count;
         Network graph(vertex_count);

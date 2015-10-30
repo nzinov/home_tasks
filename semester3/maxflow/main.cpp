@@ -4,8 +4,21 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QTimer>
+#include <iostream>
 #include "graph.h"
 #include "visualization.h"
+
+Network read_network() {
+    size_t vertex_count, edge_count;
+    std::cin >> vertex_count >> edge_count;
+    Network network(vertex_count);
+    for (size_t i = 0; i < edge_count; ++i) {
+        size_t tail, head, capacity;
+        std::cin >> tail >> head >> capacity;
+        network.add_edge(tail - 1, head - 1, capacity);
+    }
+    return network;
+}
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);

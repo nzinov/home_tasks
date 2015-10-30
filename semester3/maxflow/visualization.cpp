@@ -38,13 +38,11 @@ void VisualVertex::addNeighbour(VisualVertex* vertex) {
 QVector2D VisualVertex::calculateSprings() {
     QVector2D sum;
     for (auto neighbour : adjacent) {
-        const int NORMAL_DIST = 300;
+        const int NORMAL_DIST = 30;
         const qreal COEF = 0.02;
         QVector2D move(neighbour->position - position);
-        std::cerr << '<' << move.x()  << ';' << move.y() << '>';
         move -= move.normalized()*NORMAL_DIST;
         move *= COEF;
-        std::cerr << '<' << move.x()  << ';' << move.y() << '>';
         sum += move;
     }
     return sum;
@@ -56,7 +54,7 @@ QVector2D VisualVertex::calculateCharge(const std::vector<VisualVertex>& vertice
         if (&other == this) {
             continue;
         }
-        const qreal COEF = 500000;
+        const qreal COEF = 0.5;
         QVector2D move(other.position - position);
         sum += -move.normalized()*(COEF/move.length()*move.length());
     }
@@ -64,11 +62,8 @@ QVector2D VisualVertex::calculateCharge(const std::vector<VisualVertex>& vertice
 }
 
 void VisualVertex::simulate(const std::vector<VisualVertex>& vertices) {
-    QPoint move = (calculateSprings()).toPoint();
-    std::cerr << '$' << move.x()  << ';' << move.y() << '$';
-    std::cerr << '(' << position.x() << ';' << position.y() << ')' << "->";
+    QPoint move = (calculateCharge(vertices)).toPoint();
     this->position += move;
-    std::cerr << '(' << position.x() << ';' << position.y() << ')' << std::endl;
 }
 
 VisualEdge::VisualEdge(VisualVertex* tail, VisualVertex* head) : tail(tail), head(head) {}
@@ -108,22 +103,19 @@ void VisualEdge::paintShadow(QPainter* painter) {
     }
 }
 
-void Visualization::load() {
-    size_t vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
-    network = Network(vertex_count);
-    for (size_t i = 0; i < vertex_count; ++i) {
+void Visualization::load(Network new_network) {
+    network = std::move(new_network);
+    for (size_t i = 0 ; i < network.vertex_count; ++i) {
         addVertex();
     }
-    for (size_t i = 0; i < edge_count; ++i) {
-        size_t tail, head, capacity;
-        std::cin >> tail >> head >> capacity;
-        network.add_edge(tail - 1, head - 1, capacity);
-        addEdge(tail - 1, head - 1);
-        addEdge(head - 1, tail - 1);
-        vertices[tail - 1].addNeighbour(&vertices[head - 1]);
-        vertices[head - 1].addNeighbour(&vertices[tail - 1]);
+    for (size_t i = 0 ; i < network.vertex_count; ++i) {
+        for (size_t j = 0 ; j < i; ++j) {
+            if (network.edges[i][j].capacity > 0 || network.edge[j][i].capacity > 0) {
+                addEdge(i, j);
+            }
+        }
     }
+    updateNetwork(network);
 }
 
 void Visualization::paintEvent(QPaintEvent*) {
@@ -161,13 +153,13 @@ VisualVertex* Visualization::addVertex() {
 
 VisualEdge* Visualization::addEdge(size_t tail, size_t head) {
     edges.emplace_back(&vertices[tail], &vertices[head]);
+    edges.emplace_back(&vertices[head], &vertices[tail]);
     vertices[tail].addNeighbour(&vertices[head]);
     vertices[head].addNeighbour(&vertices[tail]);
     return &edges.back();
 }
 
 void Visualization::simulate() {
-    std::cerr << "sim";
     for (VisualVertex&  vertex : vertices) {
         vertex.simulate(vertices);
     }

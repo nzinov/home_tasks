@@ -30,7 +30,7 @@ struct Edge {
     inline bool is_open();
 };
 
-class Network {
+struct Network {
     std::vector<Vertex> vertices;
     std::vector<std::vector<Edge> > edges;
     std::queue<size_t> q;
@@ -44,7 +44,6 @@ class Network {
     inline bool discharge(size_t vertex);
     void generate_flow();
 
-public:
     Network(size_t vertex_number = 0, Log *log = nullptr);
     Edge* add_edge(size_t tail, size_t head, unsigned capacity);
     long long find_flow();

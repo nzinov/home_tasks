@@ -63,6 +63,31 @@ public:
     void addNeighbour(VisualVertex* vertex) {
         adjacent.push_back(vertex);
     }
+
+    QVector2D calculateSprings() {
+        QVector2D sum;
+        for (auto neighbour : adjacent) {
+            const int NORMAL_DIST = 100;
+            QVector2D move(neighbour->position - position);
+            move -= move.normalized()*NORMAL_DIST;
+            sum += move;
+        }
+        return sum;
+    }
+
+    QVector2D calculateCharge(const std::vector<VisualVertex>& vertices) {
+        QVector2D sum;
+        for (auto other : vertices) {
+            const int COEF = 50;
+            QVector2D move(other.position - position);
+            sum += -COEF*move.normalized()*(1/move.length()*move.length());
+        }
+        return sum;
+    }
+
+    void simulate(const std::vector<VisualVertex>& vertices) {
+        position += (calculateSprings() + calculateCharge(vertices)).toPoint();
+    }
 };
 
 const int ARROW_LENGTH = 20;
@@ -116,9 +141,11 @@ public:
             painter->drawLine(tail->getShadowPosition() - (normal*SHIFT).toPoint(), head->getShadowPosition() - (normal*SHIFT).toPoint());
         }
     }
+
 };
 
 class Visualization : public QWidget {
+    Q_OBJECT;
     std::vector<VisualVertex> vertices;
     std::vector<VisualEdge> edges;
     Log log;
@@ -174,5 +201,12 @@ class Visualization : public QWidget {
 
     void addEdge(VisualEdge element) {
         edges.push_back(element);
+    }
+
+public slots:
+    void simulate() {
+        for (auto vertex : vertices) {
+            vertex.simulate(vertices);
+        }
     }
 };

@@ -5,9 +5,9 @@
 TEMPLATE = app
 TARGET = bin/maxflow
 INCLUDEPATH += .
-QT += widgets 
+QT += widgets
 CONFIG += c++11 c++14
 
 # Input
-SOURCES += graph.cpp main.cpp log.cpp visualization.cpp graph_reader.cpp
-HEADERS += graph.h log.h action.h 
+SOURCES += graph.cpp main.cpp log.cpp visualization.cpp
+HEADERS += graph.h log.h action.h visualization.cpp

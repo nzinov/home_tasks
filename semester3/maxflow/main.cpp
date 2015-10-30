@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QTimer>
 #include "graph.h"
 #include "visualization.cpp"
 
@@ -23,6 +24,9 @@ int main(int argc, char** argv) {
     canvas.addVertex(uertex);
     canvas.updateNetwork(network);
     canvas.show();
+    QTimer timer;
+    QObject::connect(&timer, SIGNAL(timeout()), &canvas, SLOT(simulate()));
+    timer.start(500);
 
     return app.exec();
 }

@@ -13,7 +13,7 @@ Vertex::Vertex() : excess(0), height(0), current(0) {};
 
 Edge::Edge() : capacity(0), flow(0) {}
 
-inline long long Edge::extra_capacity() const {
+long long Edge::extra_capacity() const {
     assert(capacity - flow >= 0);
     return (capacity - flow);
 }

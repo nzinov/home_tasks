@@ -1,6 +1,7 @@
 #include "visualization.h"
+#include <QtGlobal>
 
-VisualVertex::VisualVertex(size_t id) : id(id) {};
+VisualVertex::VisualVertex(size_t id) : position(qrand() % 1000, qrand() % 1000), id(id) {};
 
 QPoint VisualVertex::getPosition() {
     return position;
@@ -62,7 +63,7 @@ QVector2D VisualVertex::calculateCharge(const std::vector<VisualVertex>& vertice
 }
 
 void VisualVertex::simulate(const std::vector<VisualVertex>& vertices) {
-    QPoint move = (calculateCharge(vertices)).toPoint();
+    QPoint move = (calculateSprings() + calculateCharge(vertices)).toPoint();
     this->position += move;
 }
 
@@ -105,12 +106,12 @@ void VisualEdge::paintShadow(QPainter* painter) {
 
 void Visualization::load(Network new_network) {
     network = std::move(new_network);
-    for (size_t i = 0 ; i < network.vertex_count; ++i) {
+    for (size_t i = 0 ; i < network.vertices.size(); ++i) {
         addVertex();
     }
-    for (size_t i = 0 ; i < network.vertex_count; ++i) {
+    for (size_t i = 0 ; i < network.vertices.size(); ++i) {
         for (size_t j = 0 ; j < i; ++j) {
-            if (network.edges[i][j].capacity > 0 || network.edge[j][i].capacity > 0) {
+            if (network.edges[i][j].capacity > 0 || network.edges[j][i].capacity > 0) {
                 addEdge(i, j);
             }
         }

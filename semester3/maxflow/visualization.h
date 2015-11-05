@@ -2,6 +2,7 @@
 #define VISUALIZATION
 #include <QRectF>
 #include <QBrush>
+#include <QPen>
 #include <QPainter>
 #include <QFont>
 #include <QVector2D>
@@ -11,7 +12,7 @@
 #include "log.h"
 
 const int VERTEX_RADIUS = 10;
-const int HEIGHT_MULTIPLIER = 1;
+const int HEIGHT_MULTIPLIER = 5;
 
 class ShadowedGraphicsElement {
 public:
@@ -44,7 +45,7 @@ public:
 const int ARROW_LENGTH = 20;
 const int ARROW_WIDTH = 5;
 const int LABEL_SHIFT = 20;
-const int SHIFT = 50;
+const int SHIFT = 5;
 const int FLOW_FACTOR = 3;
 
 class VisualEdge : public ShadowedGraphicsElement {
@@ -52,6 +53,7 @@ public:
     VisualVertex* tail;
     VisualVertex* head;
     const Edge* edge;
+    static void drawArrow(QPainter* painter, QPoint tail, QPoint head);
 
 public:
     VisualEdge(VisualVertex* tail, VisualVertex* head); 

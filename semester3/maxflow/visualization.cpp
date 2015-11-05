@@ -8,7 +8,7 @@ QPoint VisualVertex::getPosition() {
 }
 
 QPoint VisualVertex::getShadowPosition() {
-    return position + QPoint(height(), height());
+    return position + HEIGHT_MULTIPLIER*QPoint(height(), height());
 }
 
 int VisualVertex::height() {
@@ -20,8 +20,10 @@ void VisualVertex::updateNetwork(const Network& network) {
 }
 
 void VisualVertex::paint(QPainter* painter) {
-    painter->setBrush(Qt::red);
+    painter->setBrush(Qt::green);
+    painter->setPen(Qt::NoPen);
     painter->drawEllipse(position, VERTEX_RADIUS, VERTEX_RADIUS);
+    painter->setPen(Qt::black);
     painter->setFont(QFont("Input", 10, QFont::Bold));
     painter->drawText(QRect(position - QPoint(VERTEX_RADIUS, VERTEX_RADIUS),
                 QSize(VERTEX_RADIUS*2, VERTEX_RADIUS*2)), Qt::AlignCenter, QString().setNum(id));
@@ -29,6 +31,7 @@ void VisualVertex::paint(QPainter* painter) {
 
 void VisualVertex::paintShadow(QPainter* painter) {
     painter->setBrush(Qt::gray);
+    painter->setPen(Qt::NoPen);
     painter->drawEllipse(getShadowPosition(), VERTEX_RADIUS, VERTEX_RADIUS);
 }
 
@@ -73,25 +76,33 @@ void VisualEdge::updateNetwork(const Network& network) {
     edge = network.get_edge(tail->id, head->id);
 }
 
+void VisualEdge::drawArrow(QPainter* painter, QPoint tail, QPoint head) {
+    QVector2D direction(head - tail);
+    direction.normalize();
+    QVector2D normal(direction.y(), -direction.x());
+    painter->drawLine(head, head - (direction*ARROW_LENGTH + normal*ARROW_WIDTH).toPoint());
+    painter->drawLine(head, head - (direction*ARROW_LENGTH - normal*ARROW_WIDTH).toPoint());
+    painter->drawLine(tail, head);
+}
+
 void VisualEdge::paint(QPainter* painter) {
     if (edge->extra_capacity() > 0) {
         painter->setPen(Qt::black);
         QVector2D direction(head->getPosition() - tail->getPosition());
         direction.normalize();
         QVector2D normal(direction.y(), -direction.x());
-        painter->drawLine(head->getPosition() - (direction*VERTEX_RADIUS).toPoint() - (normal*SHIFT).toPoint(),
-                head->getPosition() - (direction*ARROW_LENGTH + normal*ARROW_WIDTH).toPoint() - (normal*SHIFT).toPoint());
-        painter->drawLine(head->getPosition() - (direction*VERTEX_RADIUS).toPoint() - (normal*SHIFT).toPoint(),
-                head->getPosition() - (direction*ARROW_LENGTH - normal*ARROW_WIDTH).toPoint() - (normal*SHIFT).toPoint());
-        painter->drawText(tail->getPosition() + (head->getPosition() - tail->getPosition()) / 2 - LABEL_SHIFT*normal.toPoint(), "x");
+        QPoint shift = SHIFT*normal.toPoint();
+        QPoint vertex_shift = direction.toPoint()*sqrt(VERTEX_RADIUS*VERTEX_RADIUS - SHIFT*SHIFT);
         painter->setPen(QPen(Qt::black, FLOW_FACTOR*edge->extra_capacity()));
-        painter->drawLine(tail->getPosition() - (normal*SHIFT).toPoint(), head->getPosition() - (normal*SHIFT).toPoint());
-        if (false) {
-            painter->setPen(QPen(Qt::red, FLOW_FACTOR*edge->flow));
-            painter->drawLine(tail->getPosition() - (normal*SHIFT).toPoint(), head->getPosition() - (normal*SHIFT).toPoint());
-        };
+        VisualEdge::drawArrow(painter, tail->getPosition() + shift + vertex_shift, head->getPosition() + shift - vertex_shift);
         painter->setPen(Qt::black);
+        painter->drawText(tail->getPosition() + (head->getPosition() - tail->getPosition()) / 2 + LABEL_SHIFT*normal.toPoint(),
+                QString().setNum(edge->extra_capacity()));
     }
+    if (edge->flow > 0) {
+        painter->setPen(QPen(Qt::red, FLOW_FACTOR*edge->flow));
+        VisualEdge::drawArrow(painter, tail->getPosition(), head->getPosition());
+    };
 }
 
 void VisualEdge::paintShadow(QPainter* painter) {
@@ -99,8 +110,8 @@ void VisualEdge::paintShadow(QPainter* painter) {
         QVector2D direction(head->getPosition() - tail->getPosition());
         direction.normalize();
         QVector2D normal(direction.y(), -direction.x());
-        painter->setPen(Qt::gray);
-        painter->drawLine(tail->getShadowPosition() - (normal*SHIFT).toPoint(), head->getShadowPosition() - (normal*SHIFT).toPoint());
+        painter->setPen(QPen(Qt::gray, 3));
+        painter->drawLine(tail->getShadowPosition() + (normal*SHIFT).toPoint(), head->getShadowPosition() + (normal*SHIFT).toPoint());
     }
 }
 

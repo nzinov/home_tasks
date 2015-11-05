@@ -1,41 +1,81 @@
 #include <string>
 #include <vector>
+#include <iostream>
 
 using std::vector;
 using std::min;
+using std::string;
 
-vector<int> prefix(std::string s) {
-    vector<int> data(s.length());
+vector<int> prefix(std::string s, int stop = -1) {
+    vector<int> data(stop == -1 ? s.length() : stop);
+    vector<int> ans;
+    int cursor = 0;
     for (int i = 1; i < s.length(); ++i) {
-        int cursor = data[i-1];
+        int new_value = 0;
         while (cursor > 0) {
             if (s[cursor] == s[i]) {
-                data[cursor] = cursor + 1;
+                new_value = cursor + 1;
                 break;
             }
             cursor = data[cursor - 1];
         }
+        cursor = new_value;
+        if (i < data.size()) { 
+            data[i] = new_value;
+        }
+        if (stop != -1 && new_value >= stop) {
+            ans.push_back(i - new_value);
+        }
     }
-    return data;
+    if (stop == -1) {
+        return data;
+    } else {
+        return ans;
+    }
 }
 
-vector<int> z(std::string s) {
-    vector<int> data(s.length());
+vector<int> z(std::string s, int stop = -1) {
+    vector<int> data(stop == -1 ? s.length() : stop);
+    vector<int> ans;
     data[0] = s.length();
+    int previous_value = s.length();
     for (int i = 1, l = 0, r = 0; i < s.length(); ++i) {
+        int new_value = 0;
         if (i <= r) {
-            data[i] = min(r + i + 1, data[i - l]);
+            new_value = min(r + i + 1, previous_value);
         }
-        while (i + data[i] < s.length() && s[data[i]] == s[i + data[i]]) {
-            ++data[i];
+        while (i + new_value < s.length() && s[new_value] == s[i + new_value]) {
+            ++new_value;
         }
-        if (i + data[i] - 1 > r) {
+        if (i + new_value - 1 > r) {
             l = i;
-            r = i + data[i] - 1;
+            r = i + new_value - 1;
+        }
+        previous_value = new_value;
+        if (i < data.size()) { 
+            data[i] = new_value;
+        }
+        if (stop != -1 && new_value >= stop) {
+            ans.push_back(i);
         }
     }
-    return data;
+    if (stop == -1) {
+        return data;
+    } else {
+        return ans;
+    }
+}
+
+template <vector<int> (*F)(string, int)> vector<int> pattern_match(string s, string pattern) {
+    string data = pattern + "#" + s;
+    return F(s, pattern.length());
 }
 
 int main() {
+    string pattern;
+    string s;
+    std::cin >> pattern >> s;
+    for (int el : pattern_match<prefix>(s, pattern)) {
+        std::cout << el << ' ';
+    }
 }

@@ -42,7 +42,7 @@ void VisualVertex::addNeighbour(VisualVertex* vertex) {
 QVector2D VisualVertex::calculateSprings() {
     QVector2D sum;
     for (auto neighbour : adjacent) {
-        const int NORMAL_DIST = 30;
+        const int NORMAL_DIST = 200;
         const qreal COEF = 0.02;
         QVector2D move(neighbour->position - position);
         move -= move.normalized()*NORMAL_DIST;

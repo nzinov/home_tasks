@@ -13,7 +13,7 @@
 #include "log.h"
 
 const int VERTEX_RADIUS = 10;
-const int HEIGHT_MULTIPLIER = 5;
+const int HEIGHT_MULTIPLIER = 7;
 
 class ShadowedGraphicsElement {
 public:
@@ -46,8 +46,8 @@ public:
 const int ARROW_LENGTH = 20;
 const int ARROW_WIDTH = 5;
 const int LABEL_SHIFT = 20;
-const int SHIFT = 5;
-const int FLOW_FACTOR = 3;
+const int SHIFT = 7;
+const int FLOW_FACTOR = 2;
 
 class VisualEdge : public ShadowedGraphicsElement {
 public:

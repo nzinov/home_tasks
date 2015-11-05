@@ -88,6 +88,21 @@ inline bool Network::discharge(size_t vertex) {
 
 void Network::generate_flow() {
     log->add(Action(), this);
+    size_t vertex_number = vertices.size();
+    if (vertex_number == 0) {
+        return;
+    }
+    vertices.front().height = vertex_number;
+    heights[0] = vertex_number - 1;
+    heights[vertex_number] = 1;
+    for (size_t tail = 0; tail < vertices.size(); ++tail) {
+        for (size_t head = 0; head < vertices.size(); ++head) {
+            if (tail == 0) {
+                run_flow(tail, head, edges[tail][head].capacity);
+            }
+        }
+    }
+    log->add(Action(), this);
     while (!q.empty()) {
         discharge(q.front());
         q.pop();
@@ -99,21 +114,12 @@ Network::Network(size_t vertex_number, Log *log) :
     edges(vertex_number, vector<Edge>(vertex_number)),
     heights(vertex_number*2 + 1),
     log(log) {
-        if (vertex_number == 0) {
-            return;
-        }
-        vertices.front().height = vertex_number;
-        heights[0] = vertex_number - 1;
-        heights[vertex_number] = 1;
 }
 
 Edge* Network::add_edge(size_t tail, size_t head, unsigned capacity) {
     edges[tail][head].capacity += capacity;
     vertices[tail].neighbours.push_back(head);
     vertices[head].neighbours.push_back(tail);
-    if (tail == 0) {
-        run_flow(tail, head, capacity);
-    }
     return &edges[tail][head];
 }
 

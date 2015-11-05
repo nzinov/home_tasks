@@ -144,9 +144,8 @@ void Visualization::paintEvent(QPaintEvent*) {
     for (auto vertex : vertices) {
         vertex.paint(&painter);
     }
-    static int counter = 0;
-    painter.drawText(50, 50, QString().setNum(counter));
-    ++counter;
+    painter.setFont(QFont("Input", 10, QFont::Bold));
+    painter.drawText(50, 50, log.action().message());
 }
 
 void Visualization::updateNetwork(const Network& network) {

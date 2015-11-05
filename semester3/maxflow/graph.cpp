@@ -43,14 +43,14 @@ inline void Network::run_flow(size_t from, size_t to, long long value) {
     vertices[from].excess -= value;
     bool flag = vertices[to].excess > 0;
     vertices[to].excess += value;
-    if (!flag && to != 0 && to != vertices.size() - 1 && vertices[to].excess > 0) { 
+    if (!flag && to != 0 && to != vertices.size() - 1 && vertices[to].excess > 0) {
         q.push(to);
     }
 }
 
 inline void Network::push(size_t source, size_t target) {
     Edge& edge = edges[source][target];
-    if (!edge.is_open() || vertices[source].height != vertices[target].height + 1) { 
+    if (!edge.is_open() || vertices[source].height != vertices[target].height + 1) {
         return;
     }
     assert(vertices[source].excess > 0);
@@ -58,7 +58,7 @@ inline void Network::push(size_t source, size_t target) {
     assert(edge.extra_capacity() > 0);
     long long extra_flow = std::min(vertices[source].excess, edge.extra_capacity());
     run_flow(source, target, extra_flow);
-    log->add(Action(Push{source, target}), this);
+    log->add(Action(Push{source, target, extra_flow}), this);
 }
 
 inline void Network::relabel(size_t vertex) {
@@ -69,14 +69,14 @@ inline void Network::relabel(size_t vertex) {
         }
     }
     set_height(vertex, lowest_height + 1);
-    log->add(Action(Relabel{vertex}), this);
+    log->add(Action(Relabel{vertex, lowest_height + 1}), this);
 }
 
 inline bool Network::discharge(size_t vertex) {
     bool updated = false;
     while (vertices[vertex].excess > 0) {
         updated = true;
-        if (vertices[vertex].current == vertices.size()) { 
+        if (vertices[vertex].current == vertices.size()) {
             relabel(vertex);
             vertices[vertex].current = 0;
         }
@@ -113,7 +113,7 @@ Edge* Network::add_edge(size_t tail, size_t head, unsigned capacity) {
     vertices[head].neighbours.push_back(tail);
     if (tail == 0) {
         run_flow(tail, head, capacity);
-    } 
+    }
     return &edges[tail][head];
 }
 

@@ -17,11 +17,10 @@ class Log {
 
 public:
     Log();
-    void add(Action action, Network network);
+    void add(Action action, const Network* network);
     const LogEntry& state();
     const Network& network();
     const Action& action();
-    void increase();
-    void decrease();
+    void step(short direction);
 };
 #endif

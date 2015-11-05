@@ -28,12 +28,12 @@ inline void Network::set_height(size_t vertex, long long height) {
     heights[prev_height]--;
     heights[height]++;
     if (heights[prev_height] == 0) {
-        log->add(Action(Gap{prev_height}), *this);
         for (size_t v = 0; v < vertices.size(); ++v) {
             if (vertices[v].height > prev_height) {
                 vertices[v].height = vertices.size();
             }
         }
+        log->add(Action(Gap{prev_height}), this);
     }
 }
 
@@ -56,13 +56,12 @@ inline void Network::push(size_t source, size_t target) {
     assert(vertices[source].excess > 0);
     assert(vertices[source].height == vertices[target].height + 1);
     assert(edge.extra_capacity() > 0);
-    log->add(Action(Push{source, target}), *this);
     long long extra_flow = std::min(vertices[source].excess, edge.extra_capacity());
     run_flow(source, target, extra_flow);
+    log->add(Action(Push{source, target}), this);
 }
 
 inline void Network::relabel(size_t vertex) {
-    log->add(Action(Relabel{vertex}), *this);
     long long lowest_height = INF;
     for (size_t i = 0; i < vertices[vertex].neighbours.size(); ++i) {
         if (edges[vertex][vertices[vertex].neighbours[i]].is_open()) {
@@ -70,6 +69,7 @@ inline void Network::relabel(size_t vertex) {
         }
     }
     set_height(vertex, lowest_height + 1);
+    log->add(Action(Relabel{vertex}), this);
 }
 
 inline bool Network::discharge(size_t vertex) {
@@ -87,6 +87,7 @@ inline bool Network::discharge(size_t vertex) {
 }
 
 void Network::generate_flow() {
+    log->add(Action(), this);
     while (!q.empty()) {
         discharge(q.front());
         q.pop();
@@ -116,7 +117,8 @@ Edge* Network::add_edge(size_t tail, size_t head, unsigned capacity) {
     return &edges[tail][head];
 }
 
-long long Network::find_flow() {
+long long Network::find_flow(Log* log) {
+    this->log = log;
     generate_flow();
     long long flow = 0;
     for (size_t vertex = 1; vertex < vertices.size(); ++vertex) {

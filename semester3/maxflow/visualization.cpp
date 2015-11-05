@@ -94,7 +94,7 @@ void VisualEdge::paint(QPainter* painter) {
         QPoint shift = SHIFT*normal.toPoint();
         QPoint vertex_shift = direction.toPoint()*sqrt(VERTEX_RADIUS*VERTEX_RADIUS - SHIFT*SHIFT);
         painter->setPen(QPen(Qt::black, FLOW_FACTOR*edge->extra_capacity()));
-        VisualEdge::drawArrow(painter, tail->getPosition() + shift + vertex_shift, head->getPosition() + shift - vertex_shift);
+        VisualEdge::drawArrow(painter, tail->getPosition() + shift, head->getPosition() + shift);
         painter->setPen(Qt::black);
         painter->drawText(tail->getPosition() + (head->getPosition() - tail->getPosition()) / 2 + LABEL_SHIFT*normal.toPoint(),
                 QString().setNum(edge->extra_capacity()));
@@ -177,3 +177,28 @@ void Visualization::simulate() {
     }
     update();
 }
+
+void Visualization::runAlgorithm() {
+    network.find_flow(&log);
+    updateNetwork(log.network());
+}
+
+void Visualization::stepForward(bool backward = false) {
+    log.step(backward ? -1 : 1);
+    updateNetwork(log.network());
+    update();
+};
+
+void Visualization::stepBackward() {
+    stepForward(true);
+}
+
+void Visualization::keyPressEvent(QKeyEvent* event) {
+    switch (event->key()) {
+        case Qt::Key_Right: stepForward();
+                              break;
+        case Qt::Key_Left: stepBackward();
+                              break;
+    }
+}
+

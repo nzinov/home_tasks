@@ -4,10 +4,12 @@ LogEntry::LogEntry(Action action, Network network) :
         action(action),
         network(network) {}
 
-Log::Log() : cursor(states.begin()) {}
+Log::Log() {
+}
 
-void Log::add(Action action, Network network) {
-    states.emplace_back(action, network);
+void Log::add(Action action, const Network* network) {
+    states.emplace_back(action, *network);
+    cursor = states.cbegin();
 }
 
 const LogEntry& Log::state() {
@@ -15,17 +17,19 @@ const LogEntry& Log::state() {
 }
 
 const Network& Log::network() {
-    return state().network;
+    return cursor->network;
 }
 
 const Action& Log::action() {
-    return state().action;
+    return cursor->action;
 }
 
-void Log::increase() {
-    ++cursor;
-}
-
-void Log::decrease() {
-    --cursor;
+void Log::step(short direction) {
+    if (cursor == states.begin() && direction < 0) {
+        return;
+    }
+    if (cursor + direction == states.end()) {
+        return;
+    }
+    cursor += direction;
 }

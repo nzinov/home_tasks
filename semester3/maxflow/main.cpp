@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     Visualization canvas;
     canvas.load(read_network());
+    canvas.runAlgorithm();
     qsrand(57);
     QTimer timer;
     QObject::connect(&timer, SIGNAL(timeout()), &canvas, SLOT(simulate()));

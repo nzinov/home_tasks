@@ -46,7 +46,7 @@ struct Network {
 
     Network(size_t vertex_number = 0, Log *log = nullptr);
     Edge* add_edge(size_t tail, size_t head, unsigned capacity);
-    long long find_flow();
+    long long find_flow(Log* log);
     const Vertex* get_vertex(size_t id) const;
     const Edge* get_edge(size_t tail, size_t head) const;
 };

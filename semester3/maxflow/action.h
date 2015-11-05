@@ -16,13 +16,14 @@ struct Gap {
 };
 
 struct Action {
-    enum {PUSH, RELABEL, GAP} tag;
+    enum {NONE, PUSH, RELABEL, GAP} tag;
     union {
         Push push;
         Relabel relabel;
         Gap gap;
     };
 
+    Action() : tag(NONE) {}
     Action(Push push) : tag(PUSH), push(push) {}
     Action(Relabel relabel) : tag(RELABEL), relabel(relabel) {}
     Action(Gap gap) : tag(GAP), gap(gap) {}

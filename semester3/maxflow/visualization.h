@@ -5,6 +5,7 @@
 #include <QPen>
 #include <QPainter>
 #include <QFont>
+#include <QKeyEvent>
 #include <QVector2D>
 #include <Qt>
 #include <QWidget>
@@ -72,9 +73,13 @@ class Visualization : public QWidget {
     public:
     void load(Network network); 
     virtual void paintEvent(QPaintEvent*); 
+    virtual void keyPressEvent(QKeyEvent* event);
     void updateNetwork(const Network& network); 
     VisualVertex* addVertex(); 
     VisualEdge* addEdge(size_t tail, size_t head); 
+    void runAlgorithm();
+    void stepForward(bool backward);
+    void stepBackward();
 
 public slots:
     void simulate();

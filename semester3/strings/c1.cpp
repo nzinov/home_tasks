@@ -7,7 +7,7 @@ int main() {
         std::cin >> current;
         data.push_back(current);
     }
-    data.pop_back();
+    //data.pop_back();
     string ans = decode_prefix(data);
     if (ans.length() == 5) {
         for (int i = 0; i < ans.length(); ++i) {

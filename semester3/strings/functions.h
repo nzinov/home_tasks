@@ -36,7 +36,7 @@ vector<int> z(std::string s, int stop = -1) {
     for (int i = 1, l = 0, r = 0; i < s.length(); ++i) {
         int new_value = 0;
         if (i <= r) {
-            new_value = min(r + i + 1, data[i - l]);
+            new_value = min(r - i + 1, data[i - l]);
         }
         while (i + new_value < s.length() && s[new_value] == s[i + new_value]) {
             ++new_value;
@@ -102,4 +102,18 @@ string decode_prefix(vector<int> data) {
         }
     }
     return s;
+}
+
+vector<int> z_to_prefix(vector<int> data) {
+    vector<int> ans(data.size(), 0);
+    for (int i = 1; i < data.size(); ++i) {
+        for (int j = data[i] - 1; j >= 0; --j) {
+            if (ans[i + j] > 0) {
+                break;
+            } else {
+                ans[i + j] = j + 1;
+            }
+        }
+    }
+    return ans;
 }

@@ -16,17 +16,18 @@ std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
 int main() {
     srand(57);
     for (int a = 0; a < 1000; ++a) {
-        string s(1000, 'a');
-        for (int i = 0; i < 1000; ++i) {
+        const int LEN = 1000;
+        string s(LEN, 'a');
+        for (int i = 0; i < LEN; ++i) {
             s[i] = 'a' + rand() % 26;
         }
-        vector<int> data = prefix(s);
-        string check = decode_prefix(data);
+        vector<int> data = z(s);
+        string check = decode_prefix(z_to_prefix(data));
         if (check > s) {
             std::cout << s << std::endl << data << std::endl << check;
             return 0;
         }
-        vector<int> data2 = prefix(check);
+        vector<int> data2 = z(check);
         if (std::mismatch(data.begin(), data.end(), data2.begin()).first != data.end()) {
             std::cout << "second:" << s << std::endl << data << std::endl << check << std::endl << data2;
             return 0;

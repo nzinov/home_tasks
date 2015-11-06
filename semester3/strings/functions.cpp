@@ -61,9 +61,39 @@ template <vector<long long> (*F)(string, long long)> void pattern_match(string s
     F(s, stop);
 }
 
+string decode_prefix(vector<int> data) {
+    long long cursor = 0;
+    string s(data.size(), 'a');
+    for (long long i = 1; i < data.size(); ++i) {
+        std::cout << i << ' ' << data[i] << std::endl;
+        if (data[i] > 0) {
+            s[i] = s[data[i] - 1];
+            std::cout << "same " << i << " = " << s[i] << std::endl;
+        } else {
+            vector<bool> used(26);
+            long long cursor = data[i];
+            while (cursor > 0) {
+                used[s[cursor] - 'a'] = true;
+                cursor = data[cursor - 1];
+            }
+            used[s[cursor] - 'a'] = true;
+            for (int j = 0; j < 26; ++j) {
+                if (!used[j]) {
+                    s[i] = 'a' + j;
+                    break;
+                }
+            }
+        }
+    }
+    return s;
+}
 int main() {
-    string pattern;
-    string s;
-    std::cin >> pattern >> s;
-    pattern_match<prefix>(s, pattern);
+    vector<int> data;
+    while (!std::cin.eof()) {
+        int current;
+        std::cin >> current;
+        data.push_back(current);
+    }
+    data.pop_back();
+    std::cout << decode_prefix(data);
 }

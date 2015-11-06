@@ -1,4 +1,3 @@
-all: bin/strings
-bin/strings : functions.cpp
+bin/% : %.cpp
 	mkdir -p bin/
 	g++ -g -std=c++0x $^ -o $@

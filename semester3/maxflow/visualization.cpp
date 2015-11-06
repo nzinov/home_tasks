@@ -43,7 +43,7 @@ QVector2D VisualVertex::calculateSprings() {
     QVector2D sum;
     for (auto neighbour : adjacent) {
         const int NORMAL_DIST = 200;
-        const qreal COEF = 0.02;
+        const qreal COEF = 0.2;
         QVector2D move(neighbour->position - position);
         move -= move.normalized()*NORMAL_DIST;
         move *= COEF;
@@ -58,7 +58,7 @@ QVector2D VisualVertex::calculateCharge(const std::vector<VisualVertex>& vertice
         if (&other == this) {
             continue;
         }
-        const qreal COEF = 0.5;
+        const qreal COEF = 5;
         QVector2D move(other.position - position);
         sum += -move.normalized()*(COEF/move.length()*move.length());
     }
@@ -94,9 +94,9 @@ void VisualEdge::paint(QPainter* painter) {
         QPoint shift = SHIFT*normal.toPoint();
         QPoint vertex_shift = direction.toPoint()*sqrt(VERTEX_RADIUS*VERTEX_RADIUS - SHIFT*SHIFT);
         painter->setPen(QPen(Qt::black, FLOW_FACTOR*edge->extra_capacity()));
-        VisualEdge::drawArrow(painter, tail->getPosition() + shift, head->getPosition() + shift);
+        VisualEdge::drawArrow(painter, tail->getPosition() - shift, head->getPosition() - shift);
         painter->setPen(Qt::black);
-        painter->drawText(tail->getPosition() + (head->getPosition() - tail->getPosition()) / 2 + LABEL_SHIFT*normal.toPoint(),
+        painter->drawText(tail->getPosition() + (head->getPosition() - tail->getPosition()) / 2 - LABEL_SHIFT*normal.toPoint(),
                 QString().setNum(edge->extra_capacity()));
     }
     if (edge->flow > 0) {
@@ -106,12 +106,9 @@ void VisualEdge::paint(QPainter* painter) {
 }
 
 void VisualEdge::paintShadow(QPainter* painter) {
-    if (edge->extra_capacity() > 0) {
-        QVector2D direction(head->getPosition() - tail->getPosition());
-        direction.normalize();
-        QVector2D normal(direction.y(), -direction.x());
+    if (edge->extra_capacity() > 0 || edge->flow > 0) {
         painter->setPen(QPen(Qt::gray, 3));
-        painter->drawLine(tail->getShadowPosition() + (normal*SHIFT).toPoint(), head->getShadowPosition() + (normal*SHIFT).toPoint());
+        painter->drawLine(tail->getShadowPosition(), head->getShadowPosition());
     }
 }
 
@@ -132,6 +129,7 @@ void Visualization::load(Network new_network) {
 
 void Visualization::paintEvent(QPaintEvent*) {
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
     for (auto edge : edges) {
         edge.paintShadow(&painter);
     }

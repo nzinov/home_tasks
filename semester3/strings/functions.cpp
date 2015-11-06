@@ -8,12 +8,12 @@ using std::string;
 
 
 
-vector<int> prefix(std::string s, int stop = -1) {
-    vector<int> data(stop == -1 ? s.length() : stop);
-    vector<int> ans;
-    int cursor = 0;
-    for (int i = 1; i < s.length(); ++i) {
-        int new_value = 0;
+vector<long long> prefix(std::string s, long long stop = -1) {
+    vector<long long> data(stop == -1 ? s.length() : stop);
+    vector<long long> ans;
+    long long cursor = 0;
+    for (long long i = 1; i < s.length(); ++i) {
+        long long new_value = 0;
         while (cursor > 0 && s[cursor] != s[i]) {
             cursor = data[cursor - 1];
         }
@@ -25,7 +25,7 @@ vector<int> prefix(std::string s, int stop = -1) {
             data[i] = new_value;
         }
         if (stop != -1 && new_value >= stop) {
-            std::cout << i - stop - 1 << ' ';
+            std::cout << i - stop - new_value << ' ';
         }
     }
     if (stop == -1) {
@@ -35,12 +35,12 @@ vector<int> prefix(std::string s, int stop = -1) {
     }
 }
 
-vector<int> z(std::string s, int stop = -1) {
-    vector<int> data(stop == -1 ? s.length() : stop);
-    vector<int> ans;
+vector<long long> z(std::string s, long long stop = -1) {
+    vector<long long> data(stop == -1 ? s.length() : stop);
+    vector<long long> ans;
     data[0] = s.length();
-    for (int i = 1, l = 0, r = 0; i < s.length(); ++i) {
-        int new_value = 0;
+    for (long long i = 1, l = 0, r = 0; i < s.length(); ++i) {
+        long long new_value = 0;
         if (i <= r) {
             new_value = min(r + i + 1, data[i - l]);
         }
@@ -65,10 +65,10 @@ vector<int> z(std::string s, int stop = -1) {
     }
 }
 
-template <vector<int> (*F)(string, int)> vector<int> pattern_match(string s, string pattern) {
-    int stop = pattern.length();
+template <vector<long long> (*F)(string, long long)> vector<long long> pattern_match(string s, string pattern) {
+    long long stop = pattern.length();
     s.insert(0, "#").insert(0, pattern);
-    vector<int> ans = F(s, stop);
+    vector<long long> ans = F(s, stop);
     return ans;
 }
 
@@ -76,5 +76,5 @@ int main() {
     string pattern;
     string s;
     std::cin >> pattern >> s;
-    vector<int> ans = pattern_match<prefix>(s, pattern);
+    vector<long long> ans = pattern_match<prefix>(s, pattern);
 }

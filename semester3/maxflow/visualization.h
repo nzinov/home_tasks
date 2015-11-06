@@ -22,14 +22,12 @@ public:
     virtual void updateNetwork(const Network& network) = 0;
 };
 
-class VisualVertex : public ShadowedGraphicsElement {
-public:
+struct VisualVertex : public ShadowedGraphicsElement {
     QPoint position;
     size_t id;
     const Vertex* vertex;
     std::vector<VisualVertex*> adjacent;
 
-public:
     VisualVertex(size_t id); 
     QPoint getPosition(); 
     QPoint getShadowPosition(); 
@@ -49,14 +47,12 @@ const int LABEL_SHIFT = 20;
 const int SHIFT = 7;
 const int FLOW_FACTOR = 2;
 
-class VisualEdge : public ShadowedGraphicsElement {
-public:
+struct VisualEdge : public ShadowedGraphicsElement {
     VisualVertex* tail;
     VisualVertex* head;
     const Edge* edge;
     static void drawArrow(QPainter* painter, QPoint tail, QPoint head);
 
-public:
     VisualEdge(VisualVertex* tail, VisualVertex* head); 
     virtual void updateNetwork(const Network& network); 
     virtual void paint(QPainter* painter); 

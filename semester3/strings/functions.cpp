@@ -12,19 +12,18 @@ vector<int> prefix(std::string s, int stop = -1) {
     int cursor = 0;
     for (int i = 1; i < s.length(); ++i) {
         int new_value = 0;
-        while (cursor > 0) {
-            if (s[cursor] == s[i]) {
-                new_value = cursor + 1;
-                break;
-            }
+        while (cursor > 0 && s[cursor] != s[i]) {
             cursor = data[cursor - 1];
+        }
+        if (s[cursor] == s[i]) {
+            new_value = cursor + 1;
         }
         cursor = new_value;
         if (i < data.size()) { 
             data[i] = new_value;
         }
         if (stop != -1 && new_value >= stop) {
-            ans.push_back(i - new_value);
+            ans.push_back(i - new_value + 1);
         }
     }
     if (stop == -1) {
@@ -38,11 +37,10 @@ vector<int> z(std::string s, int stop = -1) {
     vector<int> data(stop == -1 ? s.length() : stop);
     vector<int> ans;
     data[0] = s.length();
-    int previous_value = s.length();
     for (int i = 1, l = 0, r = 0; i < s.length(); ++i) {
         int new_value = 0;
         if (i <= r) {
-            new_value = min(r + i + 1, previous_value);
+            new_value = min(r + i + 1, data[i - l]);
         }
         while (i + new_value < s.length() && s[new_value] == s[i + new_value]) {
             ++new_value;
@@ -51,7 +49,6 @@ vector<int> z(std::string s, int stop = -1) {
             l = i;
             r = i + new_value - 1;
         }
-        previous_value = new_value;
         if (i < data.size()) { 
             data[i] = new_value;
         }
@@ -75,7 +72,7 @@ int main() {
     string pattern;
     string s;
     std::cin >> pattern >> s;
-    for (int el : pattern_match<prefix>(s, pattern)) {
+    for (int el : pattern_match<z>(s, pattern)) {
         std::cout << el << ' ';
     }
 }

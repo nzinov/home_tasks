@@ -61,14 +61,33 @@ template <vector<long long> (*F)(string, long long)> void pattern_match(string s
     F(s, stop);
 }
 
+string decode_z(vector<int> data) {
+    string s(data.size(), 'a');
+    for (long long i = 1, l = 0, r = 0; i < data.size(); ++i) {
+        std::cerr << i << ' ' << data[i] << std::endl;
+        if (data[i] > 0) {
+            s[i] = s[0];
+        } else {
+            if (i <= r) {
+                s[i] = s[i - l];
+            } else {
+                s[i] = s[0] == 'a' ? 'b' : 'a';
+            }
+        }
+        if (i + data[i] - 1 > r) {
+            l = i;
+            r = i + data[i] - 1;
+        }
+        std::cerr << s[i] << std::endl;
+        std::cerr << '(' << l << ';' << r  << ')'<< std::endl;
+    }
+    return s;
+}
 string decode_prefix(vector<int> data) {
-    long long cursor = 0;
     string s(data.size(), 'a');
     for (long long i = 1; i < data.size(); ++i) {
-        std::cout << i << ' ' << data[i] << std::endl;
         if (data[i] > 0) {
             s[i] = s[data[i] - 1];
-            std::cout << "same " << i << " = " << s[i] << std::endl;
         } else {
             vector<bool> used(26);
             long long cursor = data[i];
@@ -95,5 +114,5 @@ int main() {
         data.push_back(current);
     }
     data.pop_back();
-    std::cout << decode_prefix(data);
+    std::cout << decode_z(data);
 }

@@ -6,6 +6,8 @@ using std::vector;
 using std::min;
 using std::string;
 
+
+
 vector<int> prefix(std::string s, int stop = -1) {
     vector<int> data(stop == -1 ? s.length() : stop);
     vector<int> ans;
@@ -23,7 +25,7 @@ vector<int> prefix(std::string s, int stop = -1) {
             data[i] = new_value;
         }
         if (stop != -1 && new_value >= stop) {
-            ans.push_back(i - new_value + 1);
+            std::cout << i - stop - 1 << ' ';
         }
     }
     if (stop == -1) {
@@ -53,7 +55,7 @@ vector<int> z(std::string s, int stop = -1) {
             data[i] = new_value;
         }
         if (stop != -1 && new_value >= stop) {
-            ans.push_back(i);
+            std::cout << i - stop - 1 << ' ';
         }
     }
     if (stop == -1) {
@@ -64,15 +66,15 @@ vector<int> z(std::string s, int stop = -1) {
 }
 
 template <vector<int> (*F)(string, int)> vector<int> pattern_match(string s, string pattern) {
-    string data = pattern + "#" + s;
-    return F(s, pattern.length());
+    int stop = pattern.length();
+    s.insert(0, "#").insert(0, pattern);
+    vector<int> ans = F(s, stop);
+    return ans;
 }
 
 int main() {
     string pattern;
     string s;
     std::cin >> pattern >> s;
-    for (int el : pattern_match<z>(s, pattern)) {
-        std::cout << el << ' ';
-    }
+    vector<int> ans = pattern_match<prefix>(s, pattern);
 }

@@ -8,11 +8,11 @@ using std::string;
 
 
 
-vector<long long> prefix(std::string s, long long stop = -1) {
-    vector<long long> data(stop == -1 ? s.length() : stop);
-    long long cursor = 0;
-    for (long long i = 1; i < s.length(); ++i) {
-        long long new_value = 0;
+vector<int> prefix(std::string s, int stop = -1) {
+    vector<int> data(stop == -1 ? s.length() : stop);
+    int cursor = 0;
+    for (int i = 1; i < s.length(); ++i) {
+        int new_value = 0;
         while (cursor > 0 && s[cursor] != s[i]) {
             cursor = data[cursor - 1];
         }
@@ -30,11 +30,11 @@ vector<long long> prefix(std::string s, long long stop = -1) {
     return data;
 }
 
-vector<long long> z(std::string s, long long stop = -1) {
-    vector<long long> data(stop == -1 ? s.length() : stop);
+vector<int> z(std::string s, int stop = -1) {
+    vector<int> data(stop == -1 ? s.length() : stop);
     data[0] = s.length();
-    for (long long i = 1, l = 0, r = 0; i < s.length(); ++i) {
-        long long new_value = 0;
+    for (int i = 1, l = 0, r = 0; i < s.length(); ++i) {
+        int new_value = 0;
         if (i <= r) {
             new_value = min(r + i + 1, data[i - l]);
         }
@@ -55,15 +55,15 @@ vector<long long> z(std::string s, long long stop = -1) {
     return data;
 }
 
-template <vector<long long> (*F)(string, long long)> void pattern_match(string s, string pattern) {
-    long long stop = pattern.length();
+template <vector<int> (*F)(string, int)> void pattern_match(string s, string pattern) {
+    int stop = pattern.length();
     s.insert(0, "#").insert(0, pattern);
     F(s, stop);
 }
 
 string decode_z(vector<int> data) {
     string s(data.size(), 'a');
-    for (long long i = 1, l = 0, r = 0; i < data.size(); ++i) {
+    for (int i = 1, l = 0, r = 0; i < data.size(); ++i) {
         if (data[i] > 0) {
             s[i] = s[0];
         } else {
@@ -82,12 +82,12 @@ string decode_z(vector<int> data) {
 }
 string decode_prefix(vector<int> data) {
     string s(data.size(), 'a');
-    for (long long i = 1; i < data.size(); ++i) {
+    for (int i = 1; i < data.size(); ++i) {
         if (data[i] > 0) {
             s[i] = s[data[i] - 1];
         } else {
             vector<bool> used(26);
-            long long cursor = data[i];
+            int cursor = data[i - 1];
             while (cursor > 0) {
                 used[s[cursor] - 'a'] = true;
                 cursor = data[cursor - 1];

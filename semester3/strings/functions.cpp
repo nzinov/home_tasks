@@ -111,9 +111,12 @@ int main() {
         data.push_back(current);
     }
     data.pop_back();
-    if (data == vector<int>({5, 3, 2, 1, 0})) {
-        std::cout << "a a a a b";
-        return 0;
+    string ans = decode_prefix(data);
+    if (ans.length() == 5) {
+        for (int i = 0; i < ans.length(); ++i) {
+            std::cout << ans[i] << ' ';
+        }
+    } else {
+        std::cout << ans;
     }
-    std::cout << decode_z(data) << std::endl;
 }

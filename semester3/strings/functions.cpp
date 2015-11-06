@@ -10,7 +10,6 @@ using std::string;
 
 vector<long long> prefix(std::string s, long long stop = -1) {
     vector<long long> data(stop == -1 ? s.length() : stop);
-    vector<long long> ans;
     long long cursor = 0;
     for (long long i = 1; i < s.length(); ++i) {
         long long new_value = 0;
@@ -28,16 +27,11 @@ vector<long long> prefix(std::string s, long long stop = -1) {
             std::cout << i - stop - new_value << ' ';
         }
     }
-    if (stop == -1) {
-        return data;
-    } else {
-        return ans;
-    }
+    return data;
 }
 
 vector<long long> z(std::string s, long long stop = -1) {
     vector<long long> data(stop == -1 ? s.length() : stop);
-    vector<long long> ans;
     data[0] = s.length();
     for (long long i = 1, l = 0, r = 0; i < s.length(); ++i) {
         long long new_value = 0;
@@ -58,23 +52,18 @@ vector<long long> z(std::string s, long long stop = -1) {
             std::cout << i - stop - 1 << ' ';
         }
     }
-    if (stop == -1) {
-        return data;
-    } else {
-        return ans;
-    }
+    return data;
 }
 
-template <vector<long long> (*F)(string, long long)> vector<long long> pattern_match(string s, string pattern) {
+template <vector<long long> (*F)(string, long long)> void pattern_match(string s, string pattern) {
     long long stop = pattern.length();
     s.insert(0, "#").insert(0, pattern);
-    vector<long long> ans = F(s, stop);
-    return ans;
+    F(s, stop);
 }
 
 int main() {
     string pattern;
     string s;
     std::cin >> pattern >> s;
-    vector<long long> ans = pattern_match<prefix>(s, pattern);
+    pattern_match<prefix>(s, pattern);
 }

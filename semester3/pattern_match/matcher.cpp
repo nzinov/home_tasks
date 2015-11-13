@@ -21,8 +21,8 @@ Matcher::Matcher(const std::string& pattern) : pattern(pattern), counts(pattern.
 
 void Matcher::find_matches(const std::string& text, void (*callback)(int position)) {
     using namespace std::placeholders;
-   trie.process(text, std::bind(&Matcher::process_occurence, *this, _1, _2)); 
-   for (int i = 0; i < 0; ++i) {
+   trie.process(text, std::bind(&Matcher::process_occurence, this, _1, _2)); 
+   for (int i = 0; i < text.length(); ++i) {
        if (counts[i] == offsets.size()) {
            callback(i);
        }

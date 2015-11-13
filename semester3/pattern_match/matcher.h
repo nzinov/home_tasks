@@ -9,6 +9,7 @@ class Matcher {
 
 public:
     Matcher(const std::string& pattern);
+    ~Matcher() {};
     void process_occurence(int position, int block_id) {
         counts[position - offsets[block_id]]++;
     }

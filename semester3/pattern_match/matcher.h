@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 #include "aho.h"
 
 class Matcher {

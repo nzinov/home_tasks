@@ -1,3 +1,4 @@
+#include <iostream>
 #include "aho.h"
 
 using std::string;
@@ -34,6 +35,7 @@ Node* Node::force_go(char mark) {
 }
 
 Node::~Node() {
+    std::cerr << "enternode";
     for (short i = 0; i < ALPABET_LENGTH; ++i) {
         delete children[i];
     }

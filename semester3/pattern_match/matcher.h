@@ -6,12 +6,16 @@ class Matcher {
     const std::string& pattern;
     Trie trie;
     std::vector<int> offsets;
-    std::vector<int> counts;
+    int* counts;
 
 public:
     Matcher(const std::string& pattern);
-    ~Matcher() {};
+    ~Matcher() {
+        std::cerr << "enter" << this;
+        delete[] counts;
+    };
     void process_occurence(int position, int block_id) {
+        std::cerr << "calculate" << this;
         counts[position - offsets[block_id]]++;
     }
         

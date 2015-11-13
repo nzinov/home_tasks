@@ -6,14 +6,14 @@ Matcher::Matcher(const std::string& pattern) : pattern(pattern), counts(pattern.
     for (int i = 0; i < pattern.length(); ++i) {
         if (pattern[i] == '?') {
             if (i > position) {
-                offsets.push_back(position);
+                offsets.push_back(i);
                 trie.add_string(pattern, position, i, offsets.size() - 1);
             }
             position = i + 1;
         }
     }
     if (position < pattern.length()) {
-        offsets.push_back(position);
+        offsets.push_back(pattern.length());
         trie.add_string(pattern, position, pattern.length(), offsets.size() - 1);
     }
     trie.finalize();
@@ -23,7 +23,7 @@ void Matcher::find_matches(const std::string& text, void (*callback)(int positio
     using namespace std::placeholders;
    trie.process(text, std::bind(&Matcher::process_occurence, this, _1, _2)); 
    for (int i = 0; i < text.length(); ++i) {
-       if (counts[i] == end_offsets.size()) {
+       if (counts[i] == offsets.size()) {
            callback(i);
        }
    }

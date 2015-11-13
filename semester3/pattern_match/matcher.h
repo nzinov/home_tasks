@@ -11,8 +11,8 @@ public:
     Matcher(const std::string& pattern);
     ~Matcher() {};
     void process_occurence(int position, int block_id) {
-        if (position - offsets[block_id] >= 0) {
-            counts[position - offsets[block_id]]++;
+        if (position - offsets[block_id] + 1>= 0) {
+            counts[position - offsets[block_id] + 1]++;
         }
     }
         

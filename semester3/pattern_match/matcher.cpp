@@ -23,7 +23,7 @@ void Matcher::find_matches(const std::string& text, void (*callback)(int positio
     using namespace std::placeholders;
    trie.process(text, std::bind(&Matcher::process_occurence, this, _1, _2)); 
    for (int i = 0; i < text.length(); ++i) {
-       if (counts[i] == offsets.size()) {
+       if (counts[i] == end_offsets.size()) {
            callback(i);
        }
    }

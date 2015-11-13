@@ -22,6 +22,8 @@ class Trie {
     Node root_node;
 
 public:
+    Trie() {}
+    ~Trie() {}
     void add_string(const std::string& str, int begin, int end, short id);
     void finalize();
     void process(const std::string& text, std::function<void(int position, int substring_id)> callback);

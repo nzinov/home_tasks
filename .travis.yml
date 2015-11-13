@@ -1,15 +1,8 @@
 language: cpp
 cache:
     apt
-addons:
-    apt:
-        sources:
-            - ubuntu-sdk-team
-        packages:
-            - qtbase5-dev
 compiler:
   - gcc
 script:
-  - cd semester3/maxflow
-  - qmake -qt=qt5
+  - cd semester3/strings
   - make

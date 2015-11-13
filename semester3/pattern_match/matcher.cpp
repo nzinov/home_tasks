@@ -1,8 +1,7 @@
 #include <functional>
 #include "matcher.h"
 
-Matcher::Matcher(const std::string& pattern) : pattern(pattern) {
-    counts = new int[pattern.length()];
+Matcher::Matcher(const std::string& pattern) : pattern(pattern), counts(pattern.length()) {
     int position = 0;
     for (int i = 0; i < pattern.length(); ++i) {
         if (pattern[i] == '?') {

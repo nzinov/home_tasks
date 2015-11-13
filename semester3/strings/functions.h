@@ -8,7 +8,7 @@ using std::string;
 
 
 
-vector<int> prefix(std::string s, int stop = -1) {
+vector<int> prefix(const std::string& s, int stop = -1) {
     vector<int> data(stop == -1 ? s.length() : stop);
     int cursor = 0;
     for (int i = 1; i < s.length(); ++i) {
@@ -30,7 +30,7 @@ vector<int> prefix(std::string s, int stop = -1) {
     return data;
 }
 
-vector<int> z(std::string s, int stop = -1) {
+vector<int> z(const std::string& s, int stop = -1) {
     vector<int> data(stop == -1 ? s.length() : stop);
     data[0] = s.length();
     for (int i = 1, l = 0, r = 0; i < s.length(); ++i) {
@@ -61,25 +61,6 @@ template <vector<int> (*F)(string, int)> void pattern_match(string s, string pat
     F(s, stop);
 }
 
-string decode_z(vector<int> data) {
-    string s(data.size(), 'a');
-    for (int i = 1, l = 0, r = 0; i < data.size(); ++i) {
-        if (data[i] > 0) {
-            s[i] = s[0];
-        } else {
-            if (i <= r) {
-                s[i] = s[i - l];
-            } else {
-                s[i] = s[0] == 'a' ? 'b' : 'a';
-            }
-        }
-        if (i + data[i] - 1 > r) {
-            l = i;
-            r = i + data[i] - 1;
-        }
-    }
-    return s;
-}
 string decode_prefix(vector<int> data) {
     string s(data.size(), 'a');
     for (int i = 1; i < data.size(); ++i) {
@@ -105,15 +86,15 @@ string decode_prefix(vector<int> data) {
 }
 
 vector<int> z_to_prefix(vector<int> data) {
-    vector<int> ans(data.size(), 0);
+    vector<int> prefix(data.size(), 0);
     for (int i = 1; i < data.size(); ++i) {
         for (int j = data[i] - 1; j >= 0; --j) {
-            if (ans[i + j] > 0) {
+            if (prefix[i + j] > 0) {
                 break;
             } else {
-                ans[i + j] = j + 1;
+                prefix[i + j] = j + 1;
             }
         }
     }
-    return ans;
+    return prefix;
 }

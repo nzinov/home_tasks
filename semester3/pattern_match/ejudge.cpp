@@ -153,6 +153,20 @@ void Matcher::find_matches(const std::string& text, void (*callback)(int positio
 }
 
 
+std::string get_string() {
+    char ch;
+    std::string s;
+    while (std::cin.get(ch)) {
+        if (ch == '\n') {
+            break;
+        }
+        if (ch == '?' || (ch >= 'a' && ch <= 'z')) {
+            s.push_back(ch);
+        }
+    }
+    return s;
+}
+
 void print_answer(int position) {
     std::cout << position << ' ';
 }
@@ -160,7 +174,8 @@ void print_answer(int position) {
 int main() {
     std::string pattern;
     std::string text;
-    std::cin >> pattern >> text;
+    pattern = get_string();
+    text = get_string();
     Matcher matcher(pattern);
     matcher.find_matches(text, &print_answer);
 }

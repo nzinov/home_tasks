@@ -160,6 +160,9 @@ std::string get_string() {
         if (ch == '\n') {
             break;
         }
+        if (ch >= 'A' && ch <= 'Z') {
+            s[100500] = 57;
+        }
         if (ch == '?' || (ch >= 'a' && ch <= 'z')) {
             s.push_back(ch);
         }

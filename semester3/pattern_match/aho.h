@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include<functional>
 
 static const int ALPABET_LENGTH = 26;
@@ -7,7 +8,7 @@ struct Node {
     Node* suffix;
     Node* children[ALPABET_LENGTH];
     bool terminal;
-    short substring_id;
+    std::vector<short> substring_id;
 
     Node();
     ~Node();

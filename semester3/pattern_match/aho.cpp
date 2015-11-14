@@ -56,7 +56,7 @@ void Trie::add_string(const string& str, int begin, int end, short id) {
         cursor = cursor->force_go(str[i]);
     }
     cursor->terminal = true;
-    cursor->substring_id = id;
+    cursor->substring_id.push_back(id);
 };
 
 void Trie::finalize() {
@@ -68,7 +68,9 @@ void Trie::process(const string& text, std::function<void(int position, int subs
     for (int i = 0; i < text.length(); ++i) {
         current_state = current_state->go(text[i]);
         if (current_state->terminal) {
-            callback(i, current_state->substring_id);
+            for (auto cursor = current_state->substring_id.begin(); cursor != current_state->substring_id.end(); ++cursor) {
+                callback(i, *cursor);
+            }
         }
     }
 }

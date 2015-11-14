@@ -158,10 +158,12 @@ std::string get_string() {
     std::string s;
     while (std::cin.get(ch)) {
         if (ch == '\n') {
-            break;
+            if (s.length() > 0) {
+                break;
+            }
         }
-        if (ch >= 'A' && ch <= 'Z') {
-            s[100500] = 57;
+        if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')) {
+            abort();
         }
         if (ch == '?' || (ch >= 'a' && ch <= 'z')) {
             s.push_back(ch);

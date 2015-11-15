@@ -55,7 +55,7 @@ vector<int> z(const std::string& s, int stop = -1) {
     return data;
 }
 
-template <vector<int> (*F)(string, int)> void pattern_match(string s, string pattern) {
+template <vector<int> (*F)(const string&, int)> void pattern_match(string s, string pattern) {
     int stop = pattern.length();
     s.insert(0, "#").insert(0, pattern);
     F(s, stop);

@@ -15,6 +15,6 @@ public:
             counts[position - offsets[block_id] + 1]++;
         }
     }
-        
+
     void find_matches(const std::string& text, void (*callback)(int position));
 };

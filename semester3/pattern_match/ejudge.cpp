@@ -23,7 +23,7 @@ struct Node {
 class Trie {
     Node root_node;
 
-    public:
+public:
     Trie() {}
     ~Trie() {}
     void add_string(const std::string& str, int begin, int end, short id);
@@ -118,7 +118,7 @@ class Matcher {
     std::vector<int> offsets;
     std::vector<int> counts;
 
-    public:
+public:
     Matcher(const std::string& pattern);
     ~Matcher() {};
     void process_occurence(int position, int block_id) {
@@ -173,12 +173,7 @@ std::string get_string() {
     std::string s;
     while (std::cin.get(ch)) {
         if (ch == '\n') {
-            if (s.length() > 0) {
-                break;
-            }
-        }
-        if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')) {
-            abort();
+            break;
         }
         if (ch == '?' || (ch >= 'a' && ch <= 'z')) {
             s.push_back(ch);

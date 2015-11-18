@@ -44,7 +44,7 @@ int main() {
         for (int pos = 0; pos < (int)s2.length() - (int)s.length() + 1; ++pos) {
             bool matched = false;
             for (int i = 0; i < positions.size(); ++i) {
-                if (positions[i] = pos) {
+                if (positions[i] == pos) {
                     matched = true;
                     break;
                 }
@@ -59,6 +59,9 @@ int main() {
             if (matched ^ !mismatch) {
                 std::cerr << s << std::endl;
                 std::cerr << s2 << std::endl;
+                std::cerr << pos << std::endl;
+                std::cerr << matched << std::endl;
+                std::cerr << mismatch << std::endl;
                 std::cerr << positions << std::endl;;
                 abort();
             }

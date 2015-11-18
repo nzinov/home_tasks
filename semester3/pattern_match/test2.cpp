@@ -24,8 +24,8 @@ void print_answer(int position) {
 
 int main() {
     srand(57);
-    for (int a = 0; a < 100000; ++a) {
-        const int LEN = 1 + rand() % 200;
+    for (int a = 0; a < 1000000; ++a) {
+        const int LEN = 1 + rand() % 20;
         string s(LEN, 'a');
         for (int i = 0; i < LEN; ++i) {
             if (rand() % 2) {
@@ -34,7 +34,7 @@ int main() {
                 s[i] = 'a' + rand() % 26;
             }
         }
-        int LEN2 = 1 + rand() % 2000;
+        int LEN2 = 1 + rand() % 20000;
         string s2(LEN2, 'a');
         for (int i = 0; i < LEN2; ++i) {
             s2[i] = 'a' + rand() % 26;

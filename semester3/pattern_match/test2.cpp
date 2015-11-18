@@ -41,22 +41,26 @@ int main() {
         }
         Matcher matcher(s);
         matcher.find_matches(s2, &print_answer);
-        for (auto pos = positions.begin(); pos != positions.end(); ++pos) {
+        for (int pos = 0; pos < (int)s2.length() - (int)s.length() + 1; ++pos) {
+            bool matched = false;
+            for (int i = 0; i < positions.size(); ++i) {
+                if (positions[i] = pos) {
+                    matched = true;
+                    break;
+                }
+            }
+            bool mismatch = false;
             for (int i = 0; i < s.length(); ++i) {
-                if (i + *pos >= s2.length()) {
-                    std::cerr << s;
-                    std::cerr << s2;
-                    std::cerr << positions;
-                    std::cerr << "too long";
-                    abort();
+                if (!(s[i] == '?' || s[i] == s2[i + pos])) {
+                    mismatch = true;
+                    break;
                 }
-                if (!(s[i] == '?' || s[i] == s2[i + *pos])) {
-                    std::cerr << s;
-                    std::cerr << s2;
-                    std::cerr << positions;
-                    std::cerr << "mismatch " << s[i] << " != " << s2[i + *pos];
-                    abort();
-                }
+            }
+            if (matched ^ !mismatch) {
+                std::cerr << s << std::endl;
+                std::cerr << s2 << std::endl;
+                std::cerr << positions << std::endl;;
+                abort();
             }
         }
         positions.clear();

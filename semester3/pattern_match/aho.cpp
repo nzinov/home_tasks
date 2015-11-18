@@ -1,4 +1,4 @@
-j#include "aho.h"
+#include "aho.h"
 
 using std::string;
 

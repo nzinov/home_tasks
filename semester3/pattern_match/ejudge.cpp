@@ -98,16 +98,17 @@ void Trie::process(const string& text, std::function<void(int position, int subs
     Node* current_state = &root_node;
     for (int i = 0; i < text.length(); ++i) {
         current_state = current_state->go(text[i]);
+        Node* cursor = current_state;
         while (true) {
-            if (current_state->terminal) {
-                for (auto cursor = current_state->substring_id.begin(); cursor != current_state->substring_id.end(); ++cursor) {
-                    callback(i, *cursor);
+            if (cursor->terminal) {
+                for (auto el = cursor->substring_id.begin(); el != cursor->substring_id.end(); ++el) {
+                    callback(i, *el);
                 }
             }
-            if (!current_state->suffix) {
+            if (!cursor->suffix) {
                 break;
             }
-            current_state = current_state->suffix;
+            cursor = cursor->suffix;
         }
     }
 }

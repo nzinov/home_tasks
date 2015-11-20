@@ -2,9 +2,10 @@
 
 using std::string;
 
-Node::Node() : suffix(nullptr), terminal(false) {
+Node::Node(Node* parent, char mark) : parent(parent), mark(mark), suffix(NULL), terminal_suffix(NULL), terminal(false) {
     for (short i = 0; i < ALPABET_LENGTH; ++i) {
-        children[i] = 0;
+        children[i] = NULL;
+        transition[i] = NULL;
     }
 }
 
@@ -13,13 +14,16 @@ inline short Node::index(char ch) {
 }
 
 Node* Node::go(short mark) {
-    if (children[mark]) {
-        return children[mark];
+    if (!transition[mark]) {
+        if (children[mark]) {
+            return children[mark];
+        }
+        if (!parent) {
+            return this;
+        }
+        transition[mark] = get_suffix()->go(mark);
     }
-    if (!suffix) {
-        return this;
-    }
-    return suffix->go(mark);
+    return transition[mark];
 }
 
 Node* Node::go(char mark) {
@@ -28,7 +32,7 @@ Node* Node::go(char mark) {
 
 Node* Node::force_go(char mark) {
     if (!children[index(mark)]) {
-        children[index(mark)] = new Node();
+        children[index(mark)] = new Node(this, mark);
     }
     return children[index(mark)];
 }
@@ -39,15 +43,31 @@ Node::~Node() {
     }
 }
 
-void Node::calculate_links(Node* link) {
-    if (link) {
-        suffix = link;
+Node* Node::get_suffix() {
+    if (!parent) {
+        return this;
     }
-    for (short i = 0; i < ALPABET_LENGTH; ++i) {
-        if (children[i]) {
-            children[i]->calculate_links(suffix ? suffix->go(i) : this); 
+    if (!parent->parent) {
+        return parent;
+    }
+    if (!suffix) {
+        suffix = parent->get_suffix()->go(mark);
+    }
+    return suffix;
+}
+
+Node* Node::get_terminal_suffix() {
+    if (!parent) {
+        return NULL;
+    }
+    if (!terminal_suffix) {
+        if (get_suffix()->terminal) {
+            terminal_suffix = get_suffix();
+        } else {
+            terminal_suffix = get_suffix()->get_terminal_suffix();
         }
     }
+    return terminal_suffix;
 }
 
 void Trie::add_string(const string& str, int begin, int end, short id) {
@@ -58,10 +78,6 @@ void Trie::add_string(const string& str, int begin, int end, short id) {
     cursor->terminal = true;
     cursor->substring_id.push_back(id);
 };
-
-void Trie::finalize() {
-    root_node.calculate_links();
-}
 
 void Trie::process(const string& text, std::function<void(int position, int substring_id)> callback) {
     Node* current_state = &root_node;
@@ -74,10 +90,10 @@ void Trie::process(const string& text, std::function<void(int position, int subs
                     callback(i, *el);
                 }
             }
-            if (!cursor->suffix) {
+            if (!cursor->get_terminal_suffix()) {
                 break;
             }
-            cursor = cursor->suffix;
+            cursor = cursor->get_terminal_suffix();
         }
     }
 }

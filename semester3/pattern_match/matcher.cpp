@@ -16,7 +16,6 @@ Matcher::Matcher(const std::string& pattern) : pattern(pattern), counts(pattern.
         offsets.push_back(pattern.length());
         trie.add_string(pattern, position, pattern.length(), offsets.size() - 1);
     }
-    trie.finalize();
 }
 
 void Matcher::find_matches(const std::string& text, void (*callback)(int position)) {

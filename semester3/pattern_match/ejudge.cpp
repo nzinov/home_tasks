@@ -25,6 +25,8 @@ struct Node {
     Node* get_terminal_suffix();
 };
 
+class Matcher;
+
 class Trie {
     Node root_node;
 
@@ -32,7 +34,25 @@ public:
     Trie() {}
     ~Trie() {}
     void add_string(const std::string& str, int begin, int end, short id);
-    void process(const std::string& text, std::function<void(int position, int substring_id)> callback);
+    void process(const std::string& text, Matcher* matcher);
+};
+
+class Matcher {
+    const std::string& pattern;
+    Trie trie;
+    std::vector<int> offsets;
+    std::vector<int> counts;
+
+    public:
+    Matcher(const std::string& pattern);
+    ~Matcher() {};
+    void process_occurence(int position, int block_id) {
+        if (position - offsets[block_id] + 1>= 0) {
+            counts[position - offsets[block_id] + 1]++;
+        }
+    }
+
+    void find_matches(const std::string& text);
 };
 
 using std::string;
@@ -114,7 +134,7 @@ void Trie::add_string(const string& str, int begin, int end, short id) {
     cursor->substring_id.push_back(id);
 };
 
-void Trie::process(const string& text, std::function<void(int position, int substring_id)> callback) {
+void Trie::process(const string& text, Matcher* matcher) {
     Node* current_state = &root_node;
     for (int i = 0; i < text.length(); ++i) {
         current_state = current_state->go(text[i]);
@@ -122,7 +142,7 @@ void Trie::process(const string& text, std::function<void(int position, int subs
         while (true) {
             if (cursor->terminal) {
                 for (auto el = cursor->substring_id.begin(); el != cursor->substring_id.end(); ++el) {
-                    callback(i, *el);
+                    matcher->process_occurence(i, *el);
                 }
             }
             if (!cursor->get_terminal_suffix()) {
@@ -132,23 +152,6 @@ void Trie::process(const string& text, std::function<void(int position, int subs
         }
     }
 }
-class Matcher {
-    const std::string& pattern;
-    Trie trie;
-    std::vector<int> offsets;
-    std::vector<int> counts;
-
-public:
-    Matcher(const std::string& pattern);
-    ~Matcher() {};
-    void process_occurence(int position, int block_id) {
-        if (position - offsets[block_id] + 1>= 0) {
-            counts[position - offsets[block_id] + 1]++;
-        }
-    }
-
-    void find_matches(const std::string& text, void (*callback)(int position));
-};
 
 Matcher::Matcher(const std::string& pattern) : pattern(pattern), counts(pattern.length()) {
     int position = 0;
@@ -167,25 +170,26 @@ Matcher::Matcher(const std::string& pattern) : pattern(pattern), counts(pattern.
     }
 }
 
-void Matcher::find_matches(const std::string& text, void (*callback)(int position)) {
+void print_answer(int position) {
+    std::cout << position << ' ';
+}
+
+void Matcher::find_matches(const std::string& text) {
     if (pattern.length() == 0) {
         return;
     }
     counts.resize(text.length());
     using namespace std::placeholders;
-    trie.process(text, std::bind(&Matcher::process_occurence, this, _1, _2)); 
+    trie.process(text, this); 
     if (text.length() >= pattern.length()) {
         for (int i = 0; i < text.length() - pattern.length() + 1; ++i) {
            if (counts[i] == offsets.size()) {
-               callback(i);
+               print_answer(i);
            }
         }
     }
 }
 
-void print_answer(int position) {
-    std::cout << position << ' ';
-}
 
 std::string get_string() {
     char ch;
@@ -207,5 +211,5 @@ int main() {
     pattern = get_string();
     text = get_string();
     Matcher matcher(pattern);
-    matcher.find_matches(text, &print_answer);
+    matcher.find_matches(text);
 }

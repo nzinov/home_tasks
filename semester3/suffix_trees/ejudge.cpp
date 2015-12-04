@@ -1,5 +1,6 @@
 #include <string>
 #include <cassert>
+#include <iostream>
 
 int INF = 1000000000;
 
@@ -11,13 +12,13 @@ struct Edge {
     Node* from;
     Node* to;
 
-    Edge(Node* from = nullptr) : left(0), right(0), from(from), to(nullptr) {
+    Edge(Node* from = NULL) : left(0), right(0), from(from), to(NULL) {
     }
 
     ~Edge();
 
     bool empty() {
-        return to == nullptr;
+        return to == NULL;
     }
 
     int length() {
@@ -62,7 +63,7 @@ struct Pointer {
     int offset;
     const std::string* data;
 
-    Pointer(Edge* edge = nullptr, int offset = 0, const std::string* data = nullptr) : edge(edge), offset(offset), data(data) {
+    Pointer(Edge* edge = NULL, int offset = 0, const std::string* data = NULL) : edge(edge), offset(offset), data(data) {
     }
 
     Pointer make_pointer(Edge* edge, int offset) {
@@ -88,7 +89,7 @@ struct Pointer {
 
     Pointer get_suffix() {
         Node* current = edge->from->suffix_link;
-        if (current == nullptr) {
+        if (current == NULL) {
             return *this;
         }
         int current_offset = 0;
@@ -126,7 +127,7 @@ class SuffixTree {
 
 public:
     SuffixTree(std::string str) : data(str) {
-        joker.suffix_link = nullptr;
+        joker.suffix_link = NULL;
         root.suffix_link = &joker;
         //data.push_back('$');
         for (int i = 0; i < ALPHABET_SIZE; ++i) {
@@ -210,3 +211,12 @@ public:
         return Pointer(edge, offset, &data);
     }
 };
+
+int main() {
+    std::string a, b;
+    std::cin >> a >> b;
+    SuffixTree tree(a);
+    tree.build();
+    std::cout << tree.gcs(b);
+}
+    

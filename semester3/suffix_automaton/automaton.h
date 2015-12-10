@@ -41,7 +41,7 @@ class Automaton {
 public:
     void build(const std::string& str) {
         State* last = &initial;
-        for (int i = 0; i < str.length(); ++i) {
+        for (int i = 0; i < static_cast<int>(str.length()); ++i) {
             State* cur = new State(last->length + 1);
             short next_char = str[i] - 'a';
             while (true) {

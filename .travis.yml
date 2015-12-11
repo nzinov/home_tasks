@@ -4,5 +4,4 @@ cache:
 compiler:
   - gcc
 script:
-  - cd semester3/pattern_match
-  - make
+  - true

@@ -27,6 +27,7 @@ struct Data {
 
 struct Field {
     short color;
+    bool passed;
     char field[8][8];
 
     Field() {
@@ -40,6 +41,7 @@ struct Field {
         field[3][4] = WHITE;
         field[4][3] = WHITE;
         color = BLACK;
+        passed = false;
     }
 
     inline short op() {
@@ -126,8 +128,22 @@ struct Field {
         return ans;
     }
 
-    bool operator==(const Field& other) {
+    bool operator==(const Field& other) const {
         return std::equal(this, this + sizeof this / sizeof *this, &other);
+    }
+};
+
+struct HashField {
+    size_t operator()(const Field& field) const {
+        int p = 3;
+        int ans = 0;
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                ans += p * field.field[i][j];
+                p *= 3;
+            }
+        }
+        return ans + field.color + field.passed*2;
     }
 };
 
@@ -137,7 +153,7 @@ struct State {
 };
 
 struct Gamer {
-    std::unordered_map<Field, Data> cache;
+    std::unordered_map<Field, Data, HashField> cache;
     Field position;
 
     inline void do_move(Coord coord)
@@ -185,9 +201,19 @@ struct Gamer {
                 }
             }
             if (!has_move) {
-                cur.color = cur.op();
-                score = best_score(cur, required_depth);
-                cur.color = cur.op();
+                if (cur.passed) {
+                    if (cur.score() > 0) {
+                        score = 1000000;
+                    } else {
+                        score = -1000000;
+                    }
+                } else {
+                    cur.color = cur.op();
+                    cur.passed = true;
+                    score = best_score(cur, required_depth);
+                    cur.color = cur.op();
+                    cur.passed = false;
+                }
             }
         }
         if (cur.color == WHITE) { 
@@ -205,7 +231,7 @@ struct Gamer {
     }
 
     void move() {
-        best_score(position, 10, true);
+        best_score(position, 2, true);
     }
 };
 

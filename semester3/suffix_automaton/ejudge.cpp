@@ -8,8 +8,9 @@ struct State {
     State* suffix;
     State* transitions[ALPHA_LENGTH];
     int path_count;
+    int reference_count;
 
-    State(int length = 0, State* suffix = NULL) : length(length), suffix(suffix), path_count(0) {
+    State(int length = 0, State* suffix = NULL) : reference_count(0), length(length), suffix(suffix), path_count(0) {
         for (int i = 0; i < ALPHA_LENGTH; ++i) {
             transitions[i] = NULL;
         }
@@ -19,6 +20,9 @@ struct State {
         State* clone = new State(length, suffix);
         for (int i = 0; i < ALPHA_LENGTH; ++i) {
             clone->transitions[i] = transitions[i];
+            if (transitions[i]) {
+                transitions[i]->reference_count++;
+            }
         }
         return clone;
     }
@@ -34,6 +38,18 @@ struct State {
         }
         return path_count;
     }
+
+    ~State() {
+        for (int i = 0; i < ALPHA_LENGTH; ++i) {
+            if (transitions[i]) {
+                transitions[i]->reference_count--;
+                if (transitions[i]->reference_count <= 0) {
+                    delete transitions[i];
+                }
+            }
+        }
+    }
+
 };
 
 class Automaton {
@@ -62,11 +78,14 @@ public:
                     target->suffix = clone;
                     while (last != NULL && last->transitions[next_char] == target) {
                         last->transitions[next_char] = clone;
+                        target->reference_count--;
+                        clone->reference_count++;
                         last = last->suffix;
                     }
                     break;
                 } else {
                     last->transitions[next_char] = cur;
+                    cur->reference_count++;
                     last = last->suffix;
                 }
             }

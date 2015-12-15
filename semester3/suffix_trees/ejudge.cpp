@@ -29,10 +29,11 @@ struct Edge {
 const int ALPHABET_SIZE = 26;
 
 struct Node {
+    bool is_root;
     Node* suffix_link;
     Edge transitions[ALPHABET_SIZE];
 
-    Node() {
+    Node(bool is_root = false) : is_root(is_root) {
         for (int i = 0; i < ALPHABET_SIZE; ++i) {
             transitions[i] = Edge(this);
         }
@@ -47,8 +48,8 @@ struct Node {
 };
 
 Edge::~Edge() {
-    if (to) {
-        //delete to;
+    if (to != NULL && !to->is_root) {
+        delete to;
     }
 };
 
@@ -126,7 +127,7 @@ class SuffixTree {
     std::string data;
 
 public:
-    SuffixTree(std::string str) : data(str) {
+    SuffixTree(std::string str) : root(true), data(str) {
         joker.suffix_link = NULL;
         root.suffix_link = &joker;
         //data.push_back('$');

@@ -132,7 +132,20 @@ struct Field {
     }
 
     bool operator==(const Field& other) const {
-        return std::memcmp(this, &other, sizeof other) == 0;
+        if (color != other.color) {
+            return false;
+        }
+        if (passed != other.passed) {
+            return false;
+        }
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                if (field[i][j] != other.field[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 };
 
@@ -180,7 +193,6 @@ struct Gamer {
     int best_score(Field cur, int required_depth, bool make_move = false) {
         int score = -1000000;
         if (!make_move && cache.count(cur) && cache[cur].depth <= required_depth) {
-            cerr << "cache";
             return cache[cur].score;
         }
         Coord best_move;

@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <ctime>
 #include <string>
+#include <random>
 
 using namespace std;
 
@@ -37,10 +38,10 @@ struct Field {
                 field[i][j] = NONE;
             }
         }
-        field[3][3] = BLACK;
-        field[4][4] = BLACK;
-        field[3][4] = WHITE;
-        field[4][3] = WHITE;
+        field[3][3] = WHITE;
+        field[4][4] = WHITE;
+        field[3][4] = BLACK;
+        field[4][3] = BLACK;
         color = BLACK;
         passed = false;
     }
@@ -118,10 +119,10 @@ struct Field {
                 short cur = field[i][j];
                 switch (cur) {
                     case 0:
-                        --ans;
+                        ++ans;
                         break;
                     case 1:
-                        ++ans;
+                        --ans;
                         break;
                 }
             }
@@ -160,7 +161,7 @@ struct Gamer {
     inline void do_move(Coord coord)
     {
         string s;
-        cin >> s;
+        std::getline(cin, s);
         position.make_move(coord.x, coord.y);
         cout << "move " << (char)('a'+coord.x) << ' ' << coord.y+1 << endl;
     }
@@ -169,7 +170,6 @@ struct Gamer {
         string input;
         short x, y;
         std::getline(cin, input);
-        std::getline(cin, input);
         x = input[5] - 'a';
         y = input[7] - '1';
         position.make_move(x, y);
@@ -177,11 +177,13 @@ struct Gamer {
 
     inline void skip()
     {
+        cerr << "skip";
     }
 
     int best_score(Field cur, int required_depth, bool make_move = false) {
         int score = -1000000;
-        if (cache.count(cur) && cache[cur].depth <= required_depth) {
+        if (!make_move && cache.count(cur) && cache[cur].depth <= required_depth) {
+            cerr << "cache";
             return cache[cur].score;
         }
         Coord best_move;
@@ -199,7 +201,7 @@ struct Gamer {
                         if (cur.color == WHITE) {
                             cur_score = -cur_score;
                         }
-                        if (cur_score > score) { 
+                        if (cur_score > score) {
                             best_move = Coord(i, j);
                             score = cur_score;
                         }
@@ -222,7 +224,7 @@ struct Gamer {
                 }
             }
         }
-        if (cur.color == WHITE) { 
+        if (cur.color == WHITE) {
             score = -score;
         }
         cache[cur] = Data(score, required_depth);
@@ -246,14 +248,16 @@ int main()
     srand(time(NULL));
     Gamer gamer;
     std::string input;
-    cin >> input;
-    cin >> input;
-    bool black = input == "black";
+    getline(cin, input);
+    bool black = input[5] == 'b';
+    cerr << black;
+    gamer.position.color = !black;
     if (!black) {
         gamer.read_move();
     }
     while (true)
     {
+        cerr << "step";
         gamer.move();
         gamer.read_move();
     }

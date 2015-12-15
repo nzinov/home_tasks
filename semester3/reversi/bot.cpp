@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <ctime>
+#include <string>
 
 using namespace std;
 
@@ -158,19 +159,24 @@ struct Gamer {
 
     inline void do_move(Coord coord)
     {
+        string s;
+        cin >> s;
         position.make_move(coord.x, coord.y);
-        cout << (char)('a'+coord.x) << coord.y+1 << endl;
+        cout << "move " << (char)('a'+coord.x) << ' ' << coord.y+1 << endl;
     }
 
     void read_move() {
+        string input;
         short x, y;
-        cin >> x >> y;
+        std::getline(cin, input);
+        std::getline(cin, input);
+        x = input[5] - 'a';
+        y = input[7] - '1';
         position.make_move(x, y);
     }
 
     inline void skip()
     {
-        cout << "Skip" << endl;
     }
 
     int best_score(Field cur, int required_depth, bool make_move = false) {
@@ -239,9 +245,10 @@ int main()
 {
     srand(time(NULL));
     Gamer gamer;
-    short first;
-    cin >> first;
-    bool black = first == 1;
+    std::string input;
+    cin >> input;
+    cin >> input;
+    bool black = input == "black";
     if (!black) {
         gamer.read_move();
     }

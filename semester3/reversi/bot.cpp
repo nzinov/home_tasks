@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <ctime>
+#include <cstring>
 #include <string>
 #include <random>
 
@@ -131,21 +132,17 @@ struct Field {
     }
 
     bool operator==(const Field& other) const {
-        return std::equal(this, this + sizeof this / sizeof *this, &other);
+        return std::memcmp(this, &other, sizeof other) == 0;
     }
 };
 
 struct HashField {
     size_t operator()(const Field& field) const {
-        int p = 3;
-        int ans = 0;
-        for (int i = 0; i < 8; ++i) {
-            for (int j = 0; j < 8; ++j) {
-                ans += p * field.field[i][j];
-                p *= 3;
-            }
+        size_t ans = 0;
+        for (size_t* p = (size_t*)(&field); p < (size_t*)(&field + 1); ++p) {
+            ans ^= *p;
         }
-        return ans + field.color + field.passed*2;
+        return ans;
     }
 };
 

@@ -102,7 +102,7 @@ struct Field {
         {
             for (int j = 0; j < 8; j++)
             {
-                short cur = field[i][j];
+                short cur = field[j][i];
                 cerr << ((cur == 2) ? '.' : ((cur == 0) ? '*' : '&'));
             }
             cerr << endl;
@@ -218,14 +218,14 @@ struct Gamer {
                 } else {
                     cur.color = cur.op();
                     cur.passed = true;
-                    score = best_score(cur, required_depth);
+                    score = best_score(cur, required_depth-1);
                     cur.color = cur.op();
                     cur.passed = false;
                 }
             }
-        }
-        if (cur.color == WHITE) {
+             if (cur.color == WHITE) {
             score = -score;
+        }
         }
         cache[cur] = Data(score, required_depth);
         if (make_move) {
@@ -239,7 +239,7 @@ struct Gamer {
     }
 
     void move() {
-        best_score(position, 2, true);
+        best_score(position, 5, true);
     }
 };
 
@@ -251,13 +251,13 @@ int main()
     getline(cin, input);
     bool black = input[5] == 'b';
     cerr << black;
-    gamer.position.color = !black;
     if (!black) {
         gamer.read_move();
     }
     while (true)
     {
         cerr << "step";
+        gamer.position.print();
         gamer.move();
         gamer.read_move();
     }

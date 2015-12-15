@@ -192,7 +192,7 @@ struct Gamer {
 
     int best_score(Field cur, int required_depth, bool make_move = false) {
         int score = -1000000;
-        if (!make_move && cache.count(cur) && cache[cur].depth <= required_depth) {
+        if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
             return cache[cur].score;
         }
         Coord best_move;

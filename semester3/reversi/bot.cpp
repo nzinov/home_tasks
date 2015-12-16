@@ -322,7 +322,7 @@ struct Gamer {
             }
             if (!has_move) {
                 if (cur.passed) {
-                    score = cur.score()*100;
+                    score = cur.score()*10000;
                 } else {
                     Field next = cur;
                     next.skip();
@@ -351,6 +351,7 @@ struct Gamer {
         } else if (start > clock() && start - clock() > MIN_TICKS) {
             save_depth++;
         }
+        //cerr << save_depth << endl;
         collapse = false;
     }
 };

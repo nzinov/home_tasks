@@ -10,7 +10,6 @@
 
 using namespace std;
 
-ofstream LOG;
 const time_t TICKS = CLOCKS_PER_SEC * 11 / 4;
 const time_t MIN_TICKS = CLOCKS_PER_SEC;
 
@@ -107,15 +106,12 @@ struct Field {
 
     void print()
     {
-        LOG << endl;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 short cur = field[j][i];
-                LOG << ((cur == 2) ? ". " : ((cur == 0) ? "X " : "O "));
             }
-            LOG << endl;
         }
     }
 
@@ -224,7 +220,6 @@ struct Gamer {
         }
         position.make_move(move.x, move.y);
         cout << "move " << (char)('a'+move.x) << ' ' << move.y+1 << endl;
-        LOG << "move " << (char)('a'+move.x) << ' ' << move.y+1 << endl;
     }
 
     void process_move() {
@@ -232,22 +227,18 @@ struct Gamer {
         short x, y;
         std::getline(cin, input);
         if (input[0] != 't' && input[0] != 'm') {
-            LOG << "exit" << endl;
             exit(0);
         }
         if (input[0] == 't') {
             if (position.color != my_color) {
-                LOG << "opponent skipped" << endl;
                 position.skip();
             }
             find_move();
         } else {
             if (position.color != 1 - my_color) {
-                LOG << "skipped" << endl;
                 position.skip();
             }
             x = input[5] - 'a'; y = input[7] - '1';
-            LOG << "opponent " << input << endl;
             position.make_move(x, y);
         }
     }
@@ -255,8 +246,6 @@ struct Gamer {
     inline void skip()
     {
         position.skip();
-        position.print();
-        LOG << "skip" << endl;
     }
 
     int best_score(Field cur, int required_depth, int my = -100000, int opponent = 100000, bool make_move = false) {
@@ -265,7 +254,6 @@ struct Gamer {
         }
         int score = -1000000;
         if (required_depth > 4) {
-                LOG << "depth " << required_depth << endl;
         }
         if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
            return cache[cur].score;
@@ -290,7 +278,6 @@ struct Gamer {
                     }
                 }
             }
-            LOG << "n" << n << endl;
             for(int i = 1; i < n; ++i) {
                 for(int j = i; j > 0 && moves[j-1].score < moves[j].score; --j) {
                     swap(moves[j-1], moves[j]);
@@ -319,10 +306,8 @@ struct Gamer {
                 score = -score;
             }
             if (!has_move) {
-                LOG << "no move for " << cur.color << endl;
                 if (cur.passed) {
                     score = cur.score()*100;
-                    LOG << "win " << cur.color << endl;
                 } else {
                     Field next = cur;
                     next.skip();
@@ -351,7 +336,6 @@ struct Gamer {
         } else if (start > clock() && start - clock() > MIN_TICKS) {
             save_depth++;
         }
-        LOG << "save" << save_depth << endl;
         collapse = false;
     }
 };
@@ -362,10 +346,6 @@ int main()
     std::string input;
     getline(cin, input);
     short color = input[5] == 'w';
-    if (color)
-        LOG.open("log1.txt");
-    else
-        LOG.open("log0.txt");
     Gamer gamer;
     gamer.my_color = color;
     gamer.collapse = false;
@@ -374,6 +354,5 @@ int main()
     {
         gamer.process_move();
     }
-    LOG.close();
     return 0;
 }

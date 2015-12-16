@@ -210,6 +210,7 @@ struct Gamer {
             data.score = pos.score();
             data.depth = 0;
         }
+        return data.score;
     }
 
     inline void do_move()

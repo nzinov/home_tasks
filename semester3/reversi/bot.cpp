@@ -117,6 +117,10 @@ struct Field {
     }
 
     int coef() {
+        return coef(color);
+    }
+
+    int coef(short color) {
         return color == BLACK ? 1 : -1;
     }
 
@@ -140,8 +144,8 @@ struct Field {
         }
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 2; ++j) {
-                if (field[i*7][j*7] == color) {
-                    ans += 10*coef();
+                if (field[i*7][j*7] != NONE) {
+                    ans += 10*coef(field[i*7][j*7]);
                 }
             }
         }
@@ -149,15 +153,15 @@ struct Field {
             for (int j = 0; j < 2; ++j) {
                 if (i == 0) {
                 for (int a = 0; a < 8; ++a) {
-                    if (field[i*7+a][j*7] == color) {
-                        ans += 3*coef();
+                    if (field[i*7+a][j*7] != NONE) {
+                        ans += 6*coef(field[i*7+a][j*7]);
                     }
                 }
                 }
                 if (j == 0) {
                 for (int b = 0; b < 8; ++b) {
-                    if (field[i*7][j*7+b] == color) {
-                        ans += 3*coef();
+                    if (field[i*7][j*7+b] != NONE) {
+                        ans += 6*coef(field[i*7][j*7+b]);
                     }
                 }
                 }
@@ -250,7 +254,7 @@ struct Gamer {
             }
             if (!has_move) {
                 if (cur.passed) {
-                    return cur.score()*100;
+                    score = cur.score()*100;
                 } else {
                     cur.color = cur.op();
                     cur.passed = true;
@@ -260,7 +264,7 @@ struct Gamer {
                 }
             }
         }
-        //cache[cur] = Data(score, required_depth);
+//        cache[cur] = Data(score, required_depth);
         if (make_move) {
             if (has_move) {
                 do_move(best_move);

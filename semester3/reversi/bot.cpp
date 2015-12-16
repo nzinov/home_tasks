@@ -10,8 +10,28 @@
 
 using namespace std;
 
-const time_t TICKS = CLOCKS_PER_SEC * 11 / 4;
+const time_t TICKS = CLOCKS_PER_SEC * 8 / 3;
 const time_t MIN_TICKS = CLOCKS_PER_SEC;
+
+bool region5(short x, short y) {
+    return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
+}
+
+bool region1(short x, short y) {
+    return (x >= 2) && (x <= 5) && (y >= 2) && (y <= 5);
+}
+
+bool region4(short x, short y) {
+    return ((x == 1) || (x == 6)) && ((y == 0) || (y == 1) || (y == 6) || (y == 7)) || (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
+}
+
+bool region3(short x, short y) {
+    return ((x == 0) || (x == 7) || (y == 0) || (y == 7)) && !region4(x, y) && !region5(x, y);
+}
+
+bool region2(short x, short y) {
+    return ((x == 1) || (x == 6) || (y == 1) || (y == 6)) && !region4(x, y);
+}
 
 enum color {BLACK, WHITE, NONE};
 
@@ -139,31 +159,17 @@ struct Field {
                         --ans;
                         break;
                 }
-            }
-        }
-        for (int i = 0; i < 2; ++i) {
-            for (int j = 0; j < 2; ++j) {
-                if (field[i*7][j*7] != NONE) {
-                    ans += 10*coef(field[i*7][j*7]);
+                int rank = 0;
+                if (region5(i, j)) {
+                    rank = 50;
+                } else if (region4(i, j)) {
+                    rank = -50;
+                } else if (region3(i, j)) {
+                    rank = +20;
+                } else if (region2(i, j)) {
+                    rank = -20;
                 }
-            }
-        }
-        for (int i = 0; i < 2; ++i) {
-            for (int j = 0; j < 2; ++j) {
-                if (i == 0) {
-                for (int a = 0; a < 8; ++a) {
-                    if (field[i*7+a][j*7] != NONE) {
-                        ans += 6*coef(field[i*7+a][j*7]);
-                    }
-                }
-                }
-                if (j == 0) {
-                for (int b = 0; b < 8; ++b) {
-                    if (field[i*7][j*7+b] != NONE) {
-                        ans += 6*coef(field[i*7][j*7+b]);
-                    }
-                }
-                }
+                ans += coef(field[i][j])*rank;
             }
         }
         return ans;
@@ -251,6 +257,7 @@ struct Gamer {
 
     int best_score(Field cur, int required_depth, int my = -100000, int opponent = 100000, bool make_move = false) {
         if (clock() > start) {
+            collapse = true;
             return 0;
         }
         int score = -1000000;
@@ -264,12 +271,14 @@ struct Gamer {
         if (required_depth == 0) {
             score = cur.score();
         } else {
-            Move moves[64];
+            vector<Move> moves;
+            moves.reserve(5);
             short n = 0;
             for (int i = 0; i < 8; ++i) {
                 for (int j = 0; j < 8; ++j) {
                     if (cur.field[i][j] == NONE && cur.can_move(i, j)) {
                         has_move = true;
+                        moves.push_back(Move());
                         moves[n].field = cur;
                         moves[n].field.make_move(i, j);
                         moves[n].move.x = i;

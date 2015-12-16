@@ -1,14 +1,16 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <unordered_map>
 #include <ctime>
 #include <cstring>
 #include <string>
 #include <random>
+#include <cstdlib>
 
 using namespace std;
 
-std::ofstream LOG;
+ofstream LOG;
 const int ITER = 10;
 const int DEPTH = 2;
 
@@ -26,7 +28,7 @@ struct Data {
     short depth;
     Coord best_move;
 
-    Data(int score = 0, short depth = 0) : score(score), depth(depth) {}
+    Data(int score = 0, short depth = -1) : score(score), depth(depth) {}
 };
 
 struct Field {
@@ -105,15 +107,15 @@ struct Field {
 
     void print()
     {
-        cerr << endl;
+        LOG << endl;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 short cur = field[j][i];
-                cerr << ((cur == 2) ? '.' : ((cur == 0) ? '*' : '&'));
+                LOG << ((cur == 2) ? '.' : ((cur == 0) ? '*' : '&'));
             }
-            cerr << endl;
+            LOG << endl;
         }
     }
 
@@ -207,6 +209,10 @@ struct Gamer {
         string input;
         short x, y;
         std::getline(cin, input);
+        if (input[0] != 't' && input[0] != 'm') {
+            LOG << "exit" << endl;
+            exit(0);
+        }
         if (input[0] == 't') {
             if (position.color != my_color) {
                 LOG << "opponent skipped" << endl;
@@ -229,11 +235,13 @@ struct Gamer {
 
     int best_score(Field cur, int required_depth, bool make_move = false) {
         int score = -1000000;
-//        if (!make_move && cache.count(cur) && cache[cur].depth <= required_depth) {
-//            return cache[cur].score;
-//        }
+        if (required_depth > 4) {
+                LOG << "depth " << required_depth << endl;
+        }
+        if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
+           return cache[cur].score;
+        }
         Coord best_move;
-        LOG << "depth " << required_depth << endl;
         bool has_move = false;
         if (required_depth == 0) {
             score = cur.score();
@@ -272,7 +280,7 @@ struct Gamer {
                 }
             }
         }
-//        cache[cur] = Data(score, required_depth);
+        cache[cur] = Data(score, required_depth);
         if (make_move) {
             if (has_move) {
                 do_move(best_move);
@@ -284,7 +292,7 @@ struct Gamer {
     }
 
     void move() {
-        best_score(position, 6, true);
+        best_score(position, 3, true);
     }
 };
 

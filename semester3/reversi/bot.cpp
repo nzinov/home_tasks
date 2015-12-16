@@ -295,7 +295,7 @@ struct Gamer {
     }
 
     void move() {
-        best_score(position, 3, true);
+        best_score(position, 6, true);
     }
 };
 

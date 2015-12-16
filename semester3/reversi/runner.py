@@ -11,8 +11,8 @@ field[3][4] = BLACK;
 field[4][3] = BLACK;
 color = BLACK
 passed = False
-with Popen([sys.argv[1]], stdin=PIPE, stdout=PIPE, universal_newlines=True) as a:
-    with Popen([sys.argv[2]], stdin=PIPE, stdout=PIPE, universal_newlines=True) as b:
+with Popen(sys.argv[1].split(), stdin=PIPE, stdout=PIPE, universal_newlines=True) as a:
+    with Popen(sys.argv[2].split(), stdin=PIPE, stdout=PIPE, universal_newlines=True) as b:
         clients = [a, b]
         a.stdin.write("init black\n")
         a.stdin.flush()

@@ -113,7 +113,7 @@ struct Field {
             for (int j = 0; j < 8; j++)
             {
                 short cur = field[j][i];
-                LOG << ((cur == 2) ? '.' : ((cur == 0) ? '*' : '&'));
+                LOG << ((cur == 2) ? ". " : ((cur == 0) ? "X " : "O "));
             }
             LOG << endl;
         }
@@ -220,6 +220,10 @@ struct Gamer {
             }
             move();
         } else {
+            if (position.color != 1 - my_color) {
+                LOG << "skipped" << endl;
+                position.skip();
+            }
             x = input[5] - 'a';
             y = input[7] - '1';
             LOG << "opponent " << input << endl;
@@ -230,6 +234,7 @@ struct Gamer {
     inline void skip()
     {
         position.skip();
+        position.print();
         LOG << "skip" << endl;
     }
 
@@ -272,11 +277,9 @@ struct Gamer {
                     score = cur.score()*100;
                     LOG << "win " << cur.color << endl;
                 } else {
-                    cur.color = cur.op();
-                    cur.passed = true;
-                    score = best_score(cur, required_depth-1);
-                    cur.color = cur.op();
-                    cur.passed = false;
+                    Field next = cur;
+                    next.skip();
+                    score = best_score(next, required_depth-1);
                 }
             }
         }
@@ -298,11 +301,14 @@ struct Gamer {
 
 int main()
 {
-    LOG.open("log.txt");
     srand(time(NULL));
     std::string input;
     getline(cin, input);
     short color = input[5] == 'w';
+    if (color)
+        LOG.open("log1.txt");
+    else
+        LOG.open("log0.txt");
     Gamer gamer;
     gamer.my_color = color;
     while (true)

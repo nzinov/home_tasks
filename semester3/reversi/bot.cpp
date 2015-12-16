@@ -13,24 +13,24 @@ using namespace std;
 const time_t TICKS = CLOCKS_PER_SEC * 8 / 3;
 const time_t MIN_TICKS = CLOCKS_PER_SEC;
 
-bool region5(short x, short y) {
+bool is_corner(short x, short y) {
     return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
 }
 
-bool region1(short x, short y) {
+bool is_middle(short x, short y) {
     return (x >= 2) && (x <= 5) && (y >= 2) && (y <= 5);
 }
 
-bool region4(short x, short y) {
+bool is_pre_corner(short x, short y) {
     return ((x == 1) || (x == 6)) && ((y == 0) || (y == 1) || (y == 6) || (y == 7)) || (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
 }
 
-bool region3(short x, short y) {
-    return ((x == 0) || (x == 7) || (y == 0) || (y == 7)) && !region4(x, y) && !region5(x, y);
+bool is_side(short x, short y) {
+    return ((x == 0) || (x == 7) || (y == 0) || (y == 7)) && !is_pre_corner(x, y) && !is_corner(x, y);
 }
 
-bool region2(short x, short y) {
-    return ((x == 1) || (x == 6) || (y == 1) || (y == 6)) && !region4(x, y);
+bool is_pre_side(short x, short y) {
+    return ((x == 1) || (x == 6) || (y == 1) || (y == 6)) && !is_pre_corner(x, y);
 }
 
 enum color {BLACK, WHITE, NONE};
@@ -160,13 +160,13 @@ struct Field {
                         break;
                 }
                 int rank = 0;
-                if (region5(i, j)) {
+                if (is_corner(i, j)) {
                     rank = 50;
-                } else if (region4(i, j)) {
+                } else if (is_pre_corner(i, j)) {
                     rank = -50;
-                } else if (region3(i, j)) {
+                } else if (is_side(i, j)) {
                     rank = +20;
-                } else if (region2(i, j)) {
+                } else if (is_pre_side(i, j)) {
                     rank = -20;
                 }
                 ans += coef(field[i][j])*rank;

@@ -10,8 +10,9 @@
 
 using namespace std;
 
-const time_t TICKS = CLOCKS_PER_SEC * 8 / 3;
+const time_t TICKS = CLOCKS_PER_SEC * 14 / 15;
 const time_t MIN_TICKS = CLOCKS_PER_SEC;
+const time_t MAX_TICKS = CLOCKS_PER_SEC * 2;
 
 bool is_corner(short x, short y) {
     return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
@@ -345,7 +346,7 @@ struct Gamer {
         best_score(position, 2, -100000, 100000, true);
         best_score(position, save_depth, -100000, 100000, true);
         do_move();
-        if (collapse) {
+        if (collapse || (start > clock() && start - clock() <= MAX_TICKS)) {
             save_depth--;
         } else if (start > clock() && start - clock() > MIN_TICKS) {
             save_depth++;

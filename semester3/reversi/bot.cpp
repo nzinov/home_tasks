@@ -51,6 +51,11 @@ struct Field {
         return 1 - color;
     }
 
+    void skip() {
+     color = op();
+     passed = true;
+     }
+
     void make_move(short move_x, short move_y) {
         for (short dx = -1; dx <= 1; dx++) {
             for (short dy = -1; dy <= 1; dy++) {
@@ -110,6 +115,10 @@ struct Field {
         }
     }
 
+    int coef() {
+        return color == BLACK ? 1 : -1;
+    }
+
     int score()
     {
         int ans = 0;
@@ -125,6 +134,31 @@ struct Field {
                     case 1:
                         --ans;
                         break;
+                }
+            }
+        }
+        for (int i = 0; i < 2; ++i) {
+            for (int j = 0; j < 2; ++j) {
+                if (field[i*7][j*7] == color) {
+                    ans += 10*coef();
+                }
+            }
+        }
+        for (int i = 0; i < 2; ++i) {
+            for (int j = 0; j < 2; ++j) {
+                if (i == 0) {
+                for (int a = 0; a < 8; ++a) {
+                    if (field[i*7+a][j*7] == color) {
+                        ans += 3*coef();
+                    }
+                }
+                }
+                if (j == 0) {
+                for (int b = 0; b < 8; ++b) {
+                    if (field[i*7][j*7+b] == color) {
+                        ans += 3*coef();
+                    }
+                }
                 }
             }
         }
@@ -167,6 +201,9 @@ struct Gamer {
         string input;
         short x, y;
         std::getline(cin, input);
+        if (input[0] == 't') {
+            position.skip();
+        }
         x = input[5] - 'a';
         y = input[7] - '1';
         position.make_move(x, y);
@@ -174,14 +211,14 @@ struct Gamer {
 
     inline void skip()
     {
-        cerr << "skip";
+        position.skip();
     }
 
     int best_score(Field cur, int required_depth, bool make_move = false) {
         int score = -1000000;
-        if (!make_move && cache.count(cur) && cache[cur].depth <= required_depth) {
-            return cache[cur].score;
-        }
+//        if (!make_move && cache.count(cur) && cache[cur].depth <= required_depth) {
+//            return cache[cur].score;
+//        }
         Coord best_move;
         bool has_move = false;
         if (required_depth == 0) {
@@ -204,12 +241,15 @@ struct Gamer {
                     }
                 }
             }
+            if (cur.color == WHITE) {
+                score = -score;
+            }
             if (!has_move) {
                 if (cur.passed) {
                     if (cur.score() > 0) {
-                        score = 1000000;
+                        score = 10000;
                     } else {
-                        score = -1000000;
+                        score = -10000;
                     }
                 } else {
                     cur.color = cur.op();
@@ -219,11 +259,8 @@ struct Gamer {
                     cur.passed = false;
                 }
             }
-             if (cur.color == WHITE) {
-            score = -score;
         }
-        }
-        cache[cur] = Data(score, required_depth);
+        //cache[cur] = Data(score, required_depth);
         if (make_move) {
             if (has_move) {
                 do_move(best_move);
@@ -235,7 +272,7 @@ struct Gamer {
     }
 
     void move() {
-        best_score(position, 5, true);
+        best_score(position, 6, true);
     }
 };
 

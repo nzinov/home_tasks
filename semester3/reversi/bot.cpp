@@ -194,7 +194,7 @@ struct State {
 };
 
 struct Gamer {
-    std::unordered_map<Field, Data, HashField> cache;
+    //std::unordered_map<Field, Data, HashField> cache;
     Field position;
     short my_color;
 
@@ -243,9 +243,9 @@ struct Gamer {
         if (required_depth > 4) {
                 LOG << "depth " << required_depth << endl;
         }
-        if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
-           return cache[cur].score;
-        }
+        //if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
+        //   return cache[cur].score;
+        //}
         Coord best_move;
         bool has_move = false;
         if (required_depth == 0) {
@@ -283,7 +283,7 @@ struct Gamer {
                 }
             }
         }
-        cache[cur] = Data(score, required_depth);
+        //cache[cur] = Data(score, required_depth);
         if (make_move) {
             if (has_move) {
                 do_move(best_move);
@@ -295,7 +295,7 @@ struct Gamer {
     }
 
     void move() {
-        best_score(position, 6, true);
+        best_score(position, 4, true);
     }
 };
 

@@ -11,8 +11,8 @@
 using namespace std;
 
 ofstream LOG;
-const int ITER = 10;
-const int DEPTH = 2;
+const time_t TICKS = CLOCKS_PER_SEC * 11 / 4;
+const time_t MIN_TICKS = CLOCKS_PER_SEC;
 
 enum color {BLACK, WHITE, NONE};
 
@@ -119,15 +119,15 @@ struct Field {
         }
     }
 
-    int coef() {
+    int coef() const {
         return coef(color);
     }
 
-    int coef(short color) {
+    int coef(short color) const {
         return color == BLACK ? 1 : -1;
     }
 
-    int score()
+    int score() const
     {
         int ans = 0;
         for (int i = 0; i < 8; i++)
@@ -193,16 +193,38 @@ struct State {
     Data data;
 };
 
+struct Move {
+    Field field;
+    Coord move;
+    int score;
+};
+
 struct Gamer {
-    //std::unordered_map<Field, Data, HashField> cache;
+    std::unordered_map<Field, Data, HashField> cache;
     Field position;
     short my_color;
+    Coord move;
+    short save_depth;
+    time_t start;
+    bool collapse;
 
-    inline void do_move(Coord coord)
+    inline int get_score(const Field& pos) {
+        Data& data = cache[pos];
+        if (data.depth == -1) {
+            data.score = pos.score();
+            data.depth = 0;
+        }
+    }
+
+    inline void do_move()
     {
-        position.make_move(coord.x, coord.y);
-        cout << "move " << (char)('a'+coord.x) << ' ' << coord.y+1 << endl;
-        LOG << "move " << (char)('a'+coord.x) << ' ' << coord.y+1 << endl;
+        if (move.x == -1) {
+            skip();
+            return;
+        }
+        position.make_move(move.x, move.y);
+        cout << "move " << (char)('a'+move.x) << ' ' << move.y+1 << endl;
+        LOG << "move " << (char)('a'+move.x) << ' ' << move.y+1 << endl;
     }
 
     void process_move() {
@@ -218,14 +240,13 @@ struct Gamer {
                 LOG << "opponent skipped" << endl;
                 position.skip();
             }
-            move();
+            find_move();
         } else {
             if (position.color != 1 - my_color) {
                 LOG << "skipped" << endl;
                 position.skip();
             }
-            x = input[5] - 'a';
-            y = input[7] - '1';
+            x = input[5] - 'a'; y = input[7] - '1';
             LOG << "opponent " << input << endl;
             position.make_move(x, y);
         }
@@ -238,33 +259,59 @@ struct Gamer {
         LOG << "skip" << endl;
     }
 
-    int best_score(Field cur, int required_depth, bool make_move = false) {
+    int best_score(Field cur, int required_depth, int my = -100000, int opponent = 100000, bool make_move = false) {
+        if (clock() > start) {
+            return 0;
+        }
         int score = -1000000;
         if (required_depth > 4) {
                 LOG << "depth " << required_depth << endl;
         }
-        //if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
-        //   return cache[cur].score;
-        //}
+        if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
+           return cache[cur].score;
+        }
         Coord best_move;
         bool has_move = false;
         if (required_depth == 0) {
             score = cur.score();
         } else {
+            Move moves[64];
+            short n = 0;
             for (int i = 0; i < 8; ++i) {
                 for (int j = 0; j < 8; ++j) {
                     if (cur.field[i][j] == NONE && cur.can_move(i, j)) {
                         has_move = true;
-                        Field next = cur;
-                        next.make_move(i, j);
-                        int cur_score = best_score(next, required_depth-1);
-                        if (cur.color == WHITE) {
-                            cur_score = -cur_score;
-                        }
-                        if (cur_score > score) {
-                            best_move = Coord(i, j);
-                            score = cur_score;
-                        }
+                        moves[n].field = cur;
+                        moves[n].field.make_move(i, j);
+                        moves[n].move.x = i;
+                        moves[n].move.y = j;
+                        moves[n].score = get_score(moves[n].field);
+                        ++n;
+                    }
+                }
+            }
+            LOG << "n" << n << endl;
+            for(int i = 1; i < n; ++i) {
+                for(int j = i; j > 0 && moves[j-1].score < moves[j].score; --j) {
+                    swap(moves[j-1], moves[j]);
+                }
+            }
+            for (int i = 0; i < n; ++i) {
+                int cur_score = best_score(moves[i].field, required_depth-1, -opponent, -my);
+                if (collapse) {
+                    return 0;
+                }
+                if (cur.color == WHITE) {
+                    cur_score = -cur_score;
+                }
+                if (cur_score > score) {
+                    best_move = moves[i].move;
+                    score = cur_score;
+                }
+                if (score > my) {
+                    my = score;
+                    if (opponent <= my) {
+                        break;
                     }
                 }
             }
@@ -279,23 +326,33 @@ struct Gamer {
                 } else {
                     Field next = cur;
                     next.skip();
-                    score = best_score(next, required_depth-1);
+                    score = best_score(next, required_depth-1, -opponent, -my);
                 }
             }
         }
-        //cache[cur] = Data(score, required_depth);
+        cache[cur] = Data(score, required_depth);
         if (make_move) {
             if (has_move) {
-                do_move(best_move);
+                move = best_move;
             } else {
-                skip();
+                move = Coord(-1, -1);
             }
         }
         return score;
     }
 
-    void move() {
-        best_score(position, 4, true);
+    void find_move() {
+        start = clock() + TICKS;
+        best_score(position, 2, -100000, 100000, true);
+        best_score(position, save_depth, -100000, 100000, true);
+        do_move();
+        if (collapse) {
+            save_depth--;
+        } else if (start > clock() && start - clock() > MIN_TICKS) {
+            save_depth++;
+        }
+        LOG << "save" << save_depth << endl;
+        collapse = false;
     }
 };
 
@@ -311,6 +368,8 @@ int main()
         LOG.open("log0.txt");
     Gamer gamer;
     gamer.my_color = color;
+    gamer.collapse = false;
+    gamer.save_depth = 4;
     while (true)
     {
         gamer.process_move();

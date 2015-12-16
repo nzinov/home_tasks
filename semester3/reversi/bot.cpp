@@ -11,8 +11,8 @@
 using namespace std;
 
 const time_t TICKS = CLOCKS_PER_SEC * 14 / 15;
-const time_t MIN_TICKS = CLOCKS_PER_SEC;
-const time_t MAX_TICKS = CLOCKS_PER_SEC / 2;
+const time_t MIN_TICKS = CLOCKS_PER_SEC * 2;
+const time_t MAX_TICKS = CLOCKS_PER_SEC; 
 
 bool is_corner(short x, short y) {
     return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));

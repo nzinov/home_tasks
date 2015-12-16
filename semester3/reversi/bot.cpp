@@ -77,6 +77,7 @@ struct Field {
         }
         field[move_x][move_y] = color;
         color = op();
+        passed = false;
     }
 
     bool can_move(short move_x, short move_y) {
@@ -188,25 +189,28 @@ struct State {
 struct Gamer {
     std::unordered_map<Field, Data, HashField> cache;
     Field position;
+    short my_color;
 
     inline void do_move(Coord coord)
     {
-        string s;
-        std::getline(cin, s);
         position.make_move(coord.x, coord.y);
         cout << "move " << (char)('a'+coord.x) << ' ' << coord.y+1 << endl;
     }
 
-    void read_move() {
+    void process_move() {
         string input;
         short x, y;
         std::getline(cin, input);
         if (input[0] == 't') {
-            position.skip();
+            if (position.color != my_color) {
+                position.skip();
+            }
+            move();
+        } else {
+            x = input[5] - 'a';
+            y = input[7] - '1';
+            position.make_move(x, y);
         }
-        x = input[5] - 'a';
-        y = input[7] - '1';
-        position.make_move(x, y);
     }
 
     inline void skip()
@@ -279,20 +283,14 @@ struct Gamer {
 int main()
 {
     srand(time(NULL));
-    Gamer gamer;
     std::string input;
     getline(cin, input);
-    bool black = input[5] == 'b';
-    cerr << black;
-    if (!black) {
-        gamer.read_move();
-    }
+    short color = input[5] == 'w';
+    Gamer gamer;
+    gamer.my_color = color;
     while (true)
     {
-        cerr << "step";
-        gamer.position.print();
-        gamer.move();
-        gamer.read_move();
+        gamer.process_move();
     }
     return 0;
 }

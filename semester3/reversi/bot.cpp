@@ -10,9 +10,9 @@
 
 using namespace std;
 
-const time_t TICKS = CLOCKS_PER_SEC * 14 / 15;
+const time_t TICKS = CLOCKS_PER_SEC * 14 / 5;
 const time_t MIN_TICKS = CLOCKS_PER_SEC * 2;
-const time_t MAX_TICKS = CLOCKS_PER_SEC; 
+const time_t MAX_TICKS = CLOCKS_PER_SEC / 2; 
 
 bool is_corner(short x, short y) {
     return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
@@ -296,7 +296,7 @@ struct Gamer {
             }
             short new_depth = required_depth-1;
             for (int i = 0; i < n; ++i) {
-                if (n % 2 == 0 && new_depth > 1) {
+                if (i % 3 == 0 && new_depth > 1) {
                     new_depth--;
                 }
                 int cur_score = best_score(moves[i].field, new_depth, -opponent, -my);

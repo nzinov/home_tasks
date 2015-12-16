@@ -293,8 +293,12 @@ struct Gamer {
                     swap(moves[j-1], moves[j]);
                 }
             }
+            short new_depth = required_depth-1;
             for (int i = 0; i < n; ++i) {
-                int cur_score = best_score(moves[i].field, required_depth-1, -opponent, -my);
+                if (n % 2 == 0 && new_depth > 1) {
+                    new_depth--;
+                }
+                int cur_score = best_score(moves[i].field, new_depth, -opponent, -my);
                 if (collapse) {
                     return 0;
                 }
@@ -321,7 +325,7 @@ struct Gamer {
                 } else {
                     Field next = cur;
                     next.skip();
-                    score = best_score(next, required_depth-1, -opponent, -my);
+                    score = best_score(next, required_depth, -opponent, -my);
                 }
             }
         }

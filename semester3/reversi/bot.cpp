@@ -8,6 +8,7 @@
 
 using namespace std;
 
+std::ofstream LOG;
 const int ITER = 10;
 const int DEPTH = 2;
 
@@ -199,6 +200,7 @@ struct Gamer {
     {
         position.make_move(coord.x, coord.y);
         cout << "move " << (char)('a'+coord.x) << ' ' << coord.y+1 << endl;
+        LOG << "move " << (char)('a'+coord.x) << ' ' << coord.y+1 << endl;
     }
 
     void process_move() {
@@ -207,12 +209,14 @@ struct Gamer {
         std::getline(cin, input);
         if (input[0] == 't') {
             if (position.color != my_color) {
+                LOG << "opponent skipped" << endl;
                 position.skip();
             }
             move();
         } else {
             x = input[5] - 'a';
             y = input[7] - '1';
+            LOG << "opponent " << input << endl;
             position.make_move(x, y);
         }
     }
@@ -220,6 +224,7 @@ struct Gamer {
     inline void skip()
     {
         position.skip();
+        LOG << "skip" << endl;
     }
 
     int best_score(Field cur, int required_depth, bool make_move = false) {
@@ -228,6 +233,7 @@ struct Gamer {
 //            return cache[cur].score;
 //        }
         Coord best_move;
+        LOG << "depth " << required_depth << endl;
         bool has_move = false;
         if (required_depth == 0) {
             score = cur.score();
@@ -253,8 +259,10 @@ struct Gamer {
                 score = -score;
             }
             if (!has_move) {
+                LOG << "no move for " << cur.color << endl;
                 if (cur.passed) {
                     score = cur.score()*100;
+                    LOG << "win " << cur.color << endl;
                 } else {
                     cur.color = cur.op();
                     cur.passed = true;
@@ -282,6 +290,7 @@ struct Gamer {
 
 int main()
 {
+    LOG.open("log.txt");
     srand(time(NULL));
     std::string input;
     getline(cin, input);
@@ -292,5 +301,6 @@ int main()
     {
         gamer.process_move();
     }
+    LOG.close();
     return 0;
 }

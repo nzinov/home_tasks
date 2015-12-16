@@ -52,8 +52,8 @@ struct Field {
     }
 
     void skip() {
-     color = op();
-     passed = true;
+         color = op();
+         passed = true;
      }
 
     void make_move(short move_x, short move_y) {
@@ -250,11 +250,7 @@ struct Gamer {
             }
             if (!has_move) {
                 if (cur.passed) {
-                    if (cur.score() > 0) {
-                        score = 10000;
-                    } else {
-                        score = -10000;
-                    }
+                    return cur.score()*100;
                 } else {
                     cur.color = cur.op();
                     cur.passed = true;

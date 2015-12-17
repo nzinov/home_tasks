@@ -14,7 +14,7 @@ const time_t TICKS = CLOCKS_PER_SEC * 14 / 5;
 const time_t MIN_TICKS = CLOCKS_PER_SEC * 2;
 const time_t MAX_TICKS = CLOCKS_PER_SEC / 2;
 const time_t MAX_TICKS_PASSES = CLOCKS_PER_SEC;
-int PASSES = 20;
+int PASSES = 30;
 
 bool is_corner(short x, short y) {
     return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
@@ -105,7 +105,10 @@ struct Field {
         passed = false;
     }
 
-    bool can_move(short move_x, short move_y) {
+    bool can_move(short move_x, short move_y, short use_color = -1) const {
+        if (use_color == -1) {
+            use_color = color;
+        }
         for (short dx = -1; dx <= 1; dx++) {
             for (short dy = -1; dy <= 1; dy++) {
                 short x = move_x, y = move_y;
@@ -114,12 +117,12 @@ struct Field {
                 }
                 bool reverse = false;
                 for (x+=dx,y+=dy;x >= 0 && y >= 0 && x < 8 && y < 8; x+=dx,y+=dy) {
-                    if (field[x][y] != op()) {
+                    if (field[x][y] != 1 - use_color) {
                         break;
                     }
                     reverse = true;
                 }
-                if (x >= 0 && y >= 0 && x < 8 && y < 8 && field[x][y] == color && reverse) {
+                if (x >= 0 && y >= 0 && x < 8 && y < 8 && field[x][y] == use_color && reverse) {
                     return true;
                 }
             }
@@ -172,16 +175,23 @@ struct Field {
         {
            ans += simulate();
         }
-        ans /= PASSES;
+        ans = ans*1000/PASSES;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
+                if (field[i][j] == NONE && can_move(i, j, 1 - color)) {
+                    ans -= 1000;
+                }
                 int rank = 0;
                 if (is_corner(i, j)) {
-                    rank = 10;
+                    rank = 10000;
                 } else if (is_pre_corner(i, j)) {
-                    rank = -8;
+                    rank = -8000;
+                } else if (is_side(i, j)) {
+                    rank = 3000;
+                } else if (is_side(i, j)) {
+                    rank = -2000;
                 }
                 ans += coef(field[i][j])*rank;
             }
@@ -298,12 +308,12 @@ struct Gamer {
         position.skip();
     }
 
-    int best_score(Field cur, int required_depth, int my = -100000, int opponent = 100000, bool make_move = false) {
+    int best_score(Field cur, int required_depth, int my = -100000000, int opponent = 100000000, bool make_move = false) {
         if (clock() > start) {
             collapse = true;
             return 0;
         }
-        int score = -1000000;
+        int score = -1000000000;
         if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
            return cache[cur].score;
         }
@@ -362,7 +372,7 @@ struct Gamer {
             }
             if (!has_move) {
                 if (cur.passed) {
-                    score = cur.real_score()*10000;
+                    score = cur.real_score()*1000000;
                 } else {
                     Field next = cur;
                     next.skip();

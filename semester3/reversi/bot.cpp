@@ -12,7 +12,7 @@ using namespace std;
 
 const time_t TICKS = CLOCKS_PER_SEC * 14 / 5;
 const time_t MIN_TICKS = CLOCKS_PER_SEC * 2;
-const time_t MAX_TICKS = CLOCKS_PER_SEC / 2; 
+const time_t MAX_TICKS = CLOCKS_PER_SEC / 2;
 
 bool is_corner(short x, short y) {
     return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
@@ -23,7 +23,7 @@ bool is_middle(short x, short y) {
 }
 
 bool is_pre_corner(short x, short y) {
-    return ((x == 1) || (x == 6)) && ((y == 0) || (y == 1) || (y == 6) || (y == 7)) || (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
+    return (((x == 1) || (x == 6)) && ((y == 0) || (y == 1) || (y == 6) || (y == 7))) || (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
 }
 
 bool is_side(short x, short y) {
@@ -144,8 +144,7 @@ struct Field {
         return color == BLACK ? 1 : -1;
     }
 
-    int score() const
-    {
+    int real_score() const {
         int ans = 0;
         for (int i = 0; i < 8; i++)
         {
@@ -153,27 +152,71 @@ struct Field {
             {
                 short cur = field[i][j];
                 switch (cur) {
-                    case 0:
+                    case BLACK:
                         ++ans;
                         break;
-                    case 1:
+                    case WHITE:
                         --ans;
                         break;
                 }
+            }
+        }
+        return ans;
+    }
+    int score() const
+    {
+        int ans = 0;
+        for (int i = 0; i < 30; i++)
+        {
+           ans += simulate();
+        }
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
                 int rank = 0;
                 if (is_corner(i, j)) {
-                    rank = 50;
+                    rank = 200;
                 } else if (is_pre_corner(i, j)) {
-                    rank = -50;
+                    rank = -180;
                 } else if (is_side(i, j)) {
-                    rank = +20;
+                    rank = +60;
                 } else if (is_pre_side(i, j)) {
-                    rank = -20;
+                    rank = -50;
                 }
                 ans += coef(field[i][j])*rank;
             }
         }
         return ans;
+    }
+
+    int simulate() const {
+        Field cur = *this;
+        while (true) {
+            bool has_move = false;
+            vector<Coord> moves;
+            moves.reserve(5);
+            short n = 0;
+            for (int i = 0; i < 8; ++i) {
+                for (int j = 0; j < 8; ++j) {
+                    if (cur.field[i][j] == NONE && cur.can_move(i, j)) {
+                        has_move = true;
+                        moves.emplace_back(i, j);
+                        ++n;
+                    }
+                }
+            }
+            if (has_move) {
+                int ind = rand() % n;
+                cur.make_move(moves[ind].x, moves[ind].y);
+            } else {
+                if (cur.passed) {
+                    return cur.real_score();
+                } else {
+                    cur.skip();
+                }
+            }
+        }
     }
 
     bool operator==(const Field& other) const {
@@ -214,8 +257,8 @@ struct Gamer {
     inline int get_score(const Field& pos) {
         Data& data = cache[pos];
         if (data.depth == -1) {
-            data.score = pos.score();
-            data.depth = 0;
+           data.score = pos.score();
+           data.depth = 0;
         }
         return data.score;
     }
@@ -262,15 +305,13 @@ struct Gamer {
             return 0;
         }
         int score = -1000000;
-        if (required_depth > 4) {
-        }
         if (!make_move && cache.count(cur) && cache[cur].depth >= required_depth) {
            return cache[cur].score;
         }
         Coord best_move;
         bool has_move = false;
         if (required_depth == 0) {
-            score = cur.score();
+            score = get_score(cur);
         } else {
             vector<Move> moves;
             moves.reserve(5);
@@ -313,7 +354,7 @@ struct Gamer {
                 if (score > my) {
                     my = score;
                     if (opponent <= my) {
-                        break;
+                       break;
                     }
                 }
             }
@@ -322,7 +363,7 @@ struct Gamer {
             }
             if (!has_move) {
                 if (cur.passed) {
-                    score = cur.score()*10000;
+                    score = cur.real_score()*10000;
                 } else {
                     Field next = cur;
                     next.skip();
@@ -331,7 +372,7 @@ struct Gamer {
             }
         }
         cache[cur] = Data(score, required_depth);
-        if (make_move) {
+        if (!collapse && make_move) {
             if (has_move) {
                 move = best_move;
             } else {
@@ -351,7 +392,6 @@ struct Gamer {
         } else if (start > clock() && start - clock() > MIN_TICKS) {
             save_depth++;
         }
-        //cerr << save_depth << endl;
         collapse = false;
     }
 };

@@ -312,7 +312,7 @@ struct Gamer {
     }
 
     int best_score(Field cur, int required_depth, int my = -100000000, int opponent = 100000000, bool make_move = false) {
-        if (clock() > start) {
+        if (start != 0 && clock() > start) {
             collapse = true;
             return 0;
         }
@@ -411,15 +411,46 @@ struct Gamer {
         }
         collapse = false;
     }
+
+    void serialize() {
+        ofstream o;
+        o.open("debut.txt");
+        for (auto el : cache) {
+            char* a = (char*)&(el.first);
+            char* b = (char*)&(el.second);
+            o.write(a, sizeof(Field));
+            o.write(b, sizeof(Data));
+        }
+        o.close();
+    }
+
+    void load() {
+        ifstream o;
+        o.open("debut.txt");
+        while (!o.eof()) {
+            Field f;
+            char* a = (char*)(&f);
+            o.read(a, sizeof(Field));
+            char* b = (char*)(&cache[f]);
+            o.read(b, sizeof(Data));
+        }
+        o.close();
+    }
 };
 
 int main()
 {
     srand(time(NULL));
     std::string input;
+    Gamer gamer;
+    gamer.start = 0;
+    gamer.my_color = BLACK;
+    gamer.best_score(gamer.position, 50);
+    gamer.serialize();
+    exit(0);
+    gamer.load();
     getline(cin, input);
     short color = input[5] == 'w';
-    Gamer gamer;
     gamer.my_color = color;
     gamer.collapse = false;
     gamer.save_depth = 4;

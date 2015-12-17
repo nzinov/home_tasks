@@ -25,7 +25,7 @@ bool is_middle(short x, short y) {
 }
 
 bool is_pre_corner(short x, short y) {
-    return (((x == 1) || (x == 6)) && ((y == 0) || (y == 1) || (y == 6) || (y == 7))) || (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
+    return (((x == 1) || (x == 6)) && ((y == 0) || (y == 1) || (y == 6) || (y == 7))) || (((x == 0) || (x == 7)) && ((y == 1) || (y == 6)));
 }
 
 bool is_side(short x, short y) {
@@ -181,7 +181,7 @@ struct Field {
             for (int j = 0; j < 8; j++)
             {
                 if (field[i][j] == NONE && can_move(i, j, 1 - color)) {
-                    ans -= 1000;
+                    ans -= 500*coef();
                 }
                 int rank = 0;
                 if (is_corner(i, j)) {
@@ -191,7 +191,7 @@ struct Field {
                 } else if (is_side(i, j)) {
                     rank = 1000;
                 } else if (is_pre_side(i, j)) {
-                    rank = -500;
+                    rank = -800;
                 }
                 ans += coef(field[i][j])*rank;
             }

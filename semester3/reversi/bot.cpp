@@ -183,6 +183,9 @@ struct Field {
                 if (field[i][j] == NONE && can_move(i, j, 1 - color)) {
                     ans -= 500*coef();
                 }
+                if (field[i][j] == NONE && can_move(i, j)) {
+                    ans += 400*coef();
+                }
                 int rank = 0;
                 if (is_corner(i, j)) {
                     rank = 10000;

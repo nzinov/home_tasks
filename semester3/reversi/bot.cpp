@@ -9,6 +9,7 @@
 #include <cstdlib>
 
 using namespace std;
+ofstream LOG;
 
 const time_t TICKS = CLOCKS_PER_SEC * 14 / 5;
 const time_t MIN_TICKS = CLOCKS_PER_SEC * 2;
@@ -16,25 +17,16 @@ const time_t MAX_TICKS = CLOCKS_PER_SEC / 2;
 const time_t MAX_TICKS_PASSES = CLOCKS_PER_SEC;
 int PASSES = 30;
 
-bool is_corner(short x, short y) {
-    return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
-}
-
-bool is_middle(short x, short y) {
-    return (x >= 2) && (x <= 5) && (y >= 2) && (y <= 5);
-}
-
-bool is_pre_corner(short x, short y) {
-    return (((x == 1) || (x == 6)) && ((y == 0) || (y == 1) || (y == 6) || (y == 7))) || (((x == 0) || (x == 7)) && ((y == 1) || (y == 6)));
-}
-
-bool is_side(short x, short y) {
-    return ((x == 0) || (x == 7) || (y == 0) || (y == 7)) && !is_pre_corner(x, y) && !is_corner(x, y);
-}
-
-bool is_pre_side(short x, short y) {
-    return ((x == 1) || (x == 6) || (y == 1) || (y == 6)) && !is_pre_corner(x, y);
-}
+const int MATRIX[8][8] = {
+   { 99, -8, 8, 6, 6, 8, -8,  99,},
+   {-8, -24,  -4, -3, -3, -4, -24, -8,},
+   { 8,  -4,  7, 4, 4,  7,   -4,  8,},
+   {  6,   -3,  4, 0, 0,  4,   -3,   6,},
+   {  6,   -3,  4, 0, 0,  4,   -3,   6,},
+   { 8,   -4,  7, 4, 4,  7,   -4,  8,},
+   {-8, -24,  -4, -3, -3,  -4, -24, -8,},
+   { 99, -8, 8, 6, 6, 8, -8,  99,}
+};
 
 enum color {BLACK, WHITE, NONE};
 
@@ -132,12 +124,15 @@ struct Field {
 
     void print()
     {
+        LOG << endl;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 short cur = field[j][i];
+                LOG << (cur == NONE ? '.' : (cur == BLACK ? 'X' : 'O'));
             }
+            LOG << endl;
         }
     }
 
@@ -175,29 +170,44 @@ struct Field {
         {
            ans += simulate();
         }
-        ans = ans*1000/PASSES;
+        ans = ans*2000/PASSES;
+        int moves = 0;
+        int delta = 0;
+        int sum_pos = 0;
+        int delta_pos = 0;
+        int delta_mob = 0;
+        int mob = 0;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                if (field[i][j] == NONE && can_move(i, j, 1 - color)) {
-                    ans -= 500*coef();
+                if (field[i][j] == NONE && can_move(i, j, BLACK)) {
+                    mob++;
+                    delta_mob++;
                 }
-                if (field[i][j] == NONE && can_move(i, j)) {
-                    ans += 400*coef();
+                if (field[i][j] == NONE && can_move(i, j, WHITE)) {
+                    mob++;
+                    delta_mob--;
                 }
-                int rank = 0;
-                if (is_corner(i, j)) {
-                    rank = 10000;
-                } else if (is_pre_corner(i, j)) {
-                    rank = -5000;
-                } else if (is_side(i, j)) {
-                    rank = 1000;
-                } else if (is_pre_side(i, j)) {
-                    rank = -800;
+                if (field[i][j] != NONE) {
+                    delta_pos += coef(field[i][j])*MATRIX[i][j];
+                    sum_pos += MATRIX[i][j];
+                    moves++;
+                    delta += coef(field[i][j]);
                 }
-                ans += coef(field[i][j])*rank;
             }
+        }
+        if (sum_pos > 0) {
+            ans += delta_pos * 200000 / sum_pos;
+        }
+        if (mob > 0) {
+            ans += delta_mob * 50000 / mob;
+        }
+        if (moves < 30) {
+            ans -= delta*30000/moves;
+        }
+        if (moves > 40) {
+            ans += delta*30000/moves;
         }
         return ans;
     }
@@ -311,7 +321,7 @@ struct Gamer {
         position.skip();
     }
 
-    int best_score(Field cur, int required_depth, int my = -100000000, int opponent = 100000000, bool make_move = false) {
+    int best_score(Field cur, int required_depth, int my = -1000000000, int opponent = 1000000000, bool make_move = false) {
         if (start != 0 && clock() > start) {
             collapse = true;
             return 0;
@@ -348,9 +358,10 @@ struct Gamer {
                 }
             }
             short new_depth = required_depth-1;
+            //LOG << '{' << endl;
             for (int i = 0; i < n; ++i) {
-                if (i % 3 == 0 && new_depth > 1) {
-                    new_depth--;
+                if (i % 3 == 2 && new_depth > 1) {
+                    //new_depth--;
                 }
                 int cur_score = best_score(moves[i].field, new_depth, -opponent, -my);
                 if (collapse) {
@@ -370,6 +381,7 @@ struct Gamer {
                     }
                 }
             }
+            //LOG << '}' << endl;
             if (cur.color == WHITE) {
                 score = -score;
             }
@@ -384,6 +396,8 @@ struct Gamer {
             }
         }
         cache[cur] = Data(score, required_depth);
+        //LOG << required_depth << ':' << score << endl;
+        //cur.print();
         if (!collapse && make_move) {
             if (has_move) {
                 move = best_move;
@@ -396,11 +410,14 @@ struct Gamer {
 
     void find_move() {
         start = clock() + TICKS;
+        //LOG << "------------------";
         best_score(position, 2, -100000, 100000, true);
+        //LOG << "------------------";
         best_score(position, save_depth, -100000, 100000, true);
         do_move();
+        position.print();
         time_t left = start > clock() ? start - clock() : 0;
-        if (collapse || left <= MAX_TICKS) {
+        if ((collapse || left <= MAX_TICKS) && save_depth > 3) {
             save_depth--;
             PASSES = 30;
         } else if (left > MIN_TICKS) {
@@ -409,6 +426,7 @@ struct Gamer {
         } else if (left > MAX_TICKS_PASSES) {
             PASSES += 5;
         }
+        //LOG << collapse << ' ' << save_depth << ' ' << PASSES << endl;
         collapse = false;
     }
 
@@ -440,15 +458,16 @@ struct Gamer {
 
 int main()
 {
+    LOG.open("log.txt");
     srand(time(NULL));
     std::string input;
     Gamer gamer;
     gamer.start = 0;
     gamer.my_color = BLACK;
-    gamer.best_score(gamer.position, 50);
-    gamer.serialize();
-    exit(0);
-    gamer.load();
+    //gamer.best_score(gamer.position, 50);
+    //gamer.serialize();
+    //exit(0);
+    //gamer.load();
     getline(cin, input);
     short color = input[5] == 'w';
     gamer.my_color = color;

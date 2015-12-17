@@ -13,6 +13,8 @@ using namespace std;
 const time_t TICKS = CLOCKS_PER_SEC * 14 / 5;
 const time_t MIN_TICKS = CLOCKS_PER_SEC * 2;
 const time_t MAX_TICKS = CLOCKS_PER_SEC / 2;
+const time_t MAX_TICKS_PASSES = CLOCKS_PER_SEC;
+int PASSES = 20;
 
 bool is_corner(short x, short y) {
     return (((x == 0) || (x == 7)) && ((y == 0) || (y == 7)));
@@ -166,23 +168,20 @@ struct Field {
     int score() const
     {
         int ans = 0;
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < PASSES; i++)
         {
            ans += simulate();
         }
+        ans /= PASSES;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 int rank = 0;
                 if (is_corner(i, j)) {
-                    rank = 200;
+                    rank = 10;
                 } else if (is_pre_corner(i, j)) {
-                    rank = -180;
-                } else if (is_side(i, j)) {
-                    rank = +60;
-                } else if (is_pre_side(i, j)) {
-                    rank = -50;
+                    rank = -8;
                 }
                 ans += coef(field[i][j])*rank;
             }
@@ -387,10 +386,15 @@ struct Gamer {
         best_score(position, 2, -100000, 100000, true);
         best_score(position, save_depth, -100000, 100000, true);
         do_move();
-        if (collapse || (start > clock() && start - clock() <= MAX_TICKS)) {
+        time_t left = start > clock() ? start - clock() : 0;
+        if (collapse || left <= MAX_TICKS) {
             save_depth--;
-        } else if (start > clock() && start - clock() > MIN_TICKS) {
+            PASSES = 30;
+        } else if (left > MIN_TICKS) {
             save_depth++;
+            PASSES = 30;
+        } else if (left > MAX_TICKS_PASSES) {
+            PASSES += 5;
         }
         collapse = false;
     }

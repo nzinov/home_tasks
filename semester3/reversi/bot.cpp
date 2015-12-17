@@ -187,11 +187,11 @@ struct Field {
                 if (is_corner(i, j)) {
                     rank = 10000;
                 } else if (is_pre_corner(i, j)) {
-                    rank = -8000;
+                    rank = -5000;
                 } else if (is_side(i, j)) {
-                    rank = 3000;
-                } else if (is_side(i, j)) {
-                    rank = -2000;
+                    rank = 1000;
+                } else if (is_pre_side(i, j)) {
+                    rank = -500;
                 }
                 ans += coef(field[i][j])*rank;
             }

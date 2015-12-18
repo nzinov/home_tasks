@@ -51,6 +51,7 @@ struct Field {
     char field[8][8];
 
     Field() {
+        memset(this, 0, sizeof(Field));
         for (short i = 0; i < 8; ++i) {
             for (short j = 0; j < 8; ++j) {
                 field[i][j] = NONE;
@@ -166,11 +167,6 @@ struct Field {
     int score() const
     {
         int ans = 0;
-        for (int i = 0; i < PASSES; i++)
-        {
-           ans += simulate();
-        }
-        ans = ans*2000/PASSES;
         int moves = 0;
         int delta = 0;
         int sum_pos = 0;

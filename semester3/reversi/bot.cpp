@@ -12,7 +12,7 @@ using namespace std;
 ofstream LOG;
 
 const time_t TICKS = CLOCKS_PER_SEC * 14 / 5;
-const time_t MIN_TICKS = CLOCKS_PER_SEC * 2;
+const time_t MIN_TICKS = CLOCKS_PER_SEC * 5 / 4;
 const time_t MAX_TICKS = CLOCKS_PER_SEC / 2;
 const time_t MAX_TICKS_PASSES = CLOCKS_PER_SEC;
 int PASSES = 30;
@@ -415,15 +415,12 @@ struct Gamer {
         time_t left = start > clock() ? start - clock() : 0;
         if ((collapse || left <= MAX_TICKS) && save_depth > 3) {
             save_depth--;
-            PASSES = 30;
         } else if (left > MIN_TICKS) {
             save_depth++;
-            PASSES = 30;
-        } else if (left > MAX_TICKS_PASSES) {
-            PASSES += 5;
         }
         //LOG << collapse << ' ' << save_depth << ' ' << PASSES << endl;
         collapse = false;
+        cerr << save_depth << endl;
     }
 
     void serialize() {

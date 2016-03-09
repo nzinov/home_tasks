@@ -2,6 +2,8 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <mutex>
+#include <chrono>
 
 const std::size_t EMPTY_HASH = std::hash<std::thread::id>()(std::thread::id());
 
@@ -26,34 +28,61 @@ public:
     }
 };
 
-int counter = 0;
-Futex mutex;
+template<typename Mutex> class Lock {
+    Mutex* mutex;
+public:
+    Lock(Mutex* mutex) : mutex(mutex) {
+        mutex->lock();
+    }
 
-void add(int& local) {
+    ~Lock() {
+        mutex->unlock();
+    }
+};
+
+const std::size_t TARGET = 10000000;
+
+template<typename Mutex> void add(std::size_t& local, std::size_t& global, Mutex* mutex) {
     while (true) {
-        mutex.lock();
-        if (counter >= 10000000) {
+        mutex->lock();
+        if (global >= TARGET) {
+            mutex->unlock();
             break;
         }
-        counter++;
+        global++;
+        mutex->unlock();
         local++;
-        mutex.unlock();
     }
 }
 
-int main() {
+template<typename Mutex> void test(std::size_t thread_num) {
     std::vector<std::thread> threads;
-    const int THREAD_NUM = 4;
-    std::vector<int> counters(THREAD_NUM);
-    for (int i = 0; i < THREAD_NUM; ++i) {
-        threads.emplace_back(add, std::ref(counters[i]));
+    std::vector<std::size_t> counters(thread_num);
+    std::size_t counter = 0;
+    Mutex mutex;
+    auto start = std::chrono::steady_clock::now();
+    for (std::size_t i = 0; i < thread_num; ++i) {
+        threads.emplace_back(add<Mutex>, std::ref(counters[i]), std::ref(counter), &mutex);
     }
     for (auto& thread : threads) {
         thread.join();
     }
+    std::chrono::milliseconds delta = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+    std::cout << "thread-local counts: ";
+    std::size_t sum = 0;
     for (auto el : counters) {
         std::cout << el << ' ';
+        sum += el;
     }
     std::cout << std::endl;
-    std::cout << counter;
+    std::cout << "sum of counters: " << sum << std::endl;
+    std::cout << "global counter: " << counter << std::endl;
+    std::cout << "time: " << delta.count() << std::endl;
+}
+
+int main() {
+    for (std::size_t thread_num : {std::thread::hardware_concurrency() / 2, std::thread::hardware_concurrency() * 2}) {
+        test<Futex>(thread_num);
+        test<std::mutex>(thread_num);
+    }
 }

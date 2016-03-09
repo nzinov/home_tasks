@@ -84,7 +84,7 @@ struct Line {
 
     Line(const Segment& segment) : A(segment.ends[0].y - segment.ends[1].y),
     B(segment.ends[1].x - segment.ends[0].x),
-    C(-A*segment.ends[0].x - B*segment.ends[1].y) {
+    C(-A*segment.ends[0].x - B*segment.ends[0].y) {
     }
 
     void normalize() {
@@ -109,11 +109,13 @@ double distance(const Point& point, const Segment& segment) {
     if (segment.is_point()) {
         return distance(point, segment.ends[0]);
     }
-    double t = dot(point - segment.ends[0], segment.vector()) / (double)segment.sq_length();
-    if (t >= 1) {
-        return sqrt(distance(point, segment.ends[1]));
-    } else if (t <= 0) {
-        return sqrt(distance(point, segment.ends[0]));
+    long long a = sq_distance(point, segment.ends[0]);
+    long long b = sq_distance(point, segment.ends[1]);
+    long long c = segment.sq_length();
+    if (a >= b + c) {
+        return sqrt(b);
+    } else if (b >= a + c) {
+        return sqrt(a);
     } else {
         return distance(point, Line(segment));
     }

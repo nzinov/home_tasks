@@ -28,18 +28,6 @@ public:
     }
 };
 
-template<typename Mutex> class Lock {
-    Mutex* mutex;
-public:
-    Lock(Mutex* mutex) : mutex(mutex) {
-        mutex->lock();
-    }
-
-    ~Lock() {
-        mutex->unlock();
-    }
-};
-
 const std::size_t TARGET = 10000000;
 
 template<typename Mutex> void add(std::size_t& local, std::size_t& global, Mutex* mutex) {

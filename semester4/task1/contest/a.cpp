@@ -10,8 +10,20 @@ struct Point {
     Point(long long x = 0, long long y = 0) : x(x), y(y) {
     }
 
+    Point operator+(const Point& other) const {
+        return Point(x + other.x, y + other.y);
+    }
+
     Point operator-(const Point& other) const {
         return Point(x - other.x, y - other.y);
+    }
+
+    Point operator*(long long factor) const{
+        return Point(factor*x, factor*y);
+    }
+
+    Point operator/(long long factor) const{
+        return Point(factor*x, factor*y);
     }
 
     friend std::ostream& operator<<(std::ostream& str, const Point& point) {
@@ -22,6 +34,10 @@ struct Point {
     friend std::istream& operator>>(std::istream& str, Point& point) {
         str >> point.x >> point.y;
         return str;
+    }
+
+    friend long long dot(const Point& a, const Point& b) {
+        return a.x*b.x + a.y*b.y;
     }
 
     bool operator==(const Point& other) const {
@@ -53,6 +69,10 @@ struct Segment {
 
     bool is_point() const {
         return ends[0] == ends[1];
+    }
+
+    Point vector() const {
+        return ends[1] - ends[0];
     }
 };
 
@@ -89,13 +109,11 @@ double distance(const Point& point, const Segment& segment) {
     if (segment.is_point()) {
         return distance(point, segment.ends[0]);
     }
-    long long a = sq_distance(point, segment.ends[0]);
-    long long b = sq_distance(point, segment.ends[1]);
-    long long c = segment.sq_length();
-    if (a >= b + c) {
-        return sqrt(b);
-    } else if (b >= a + c) {
-        return sqrt(a);
+    double t = dot(point - segment.ends[0], segment.vector()) / (double)segment.sq_length();
+    if (t >= 1) {
+        return sqrt(distance(point, segment.ends[1]));
+    } else if (t <= 0) {
+        return sqrt(distance(point, segment.ends[0]));
     } else {
         return distance(point, Line(segment));
     }
@@ -116,4 +134,3 @@ int main() {
     in >> point >> line;
     out << distance(point, line) << std::endl;
 }
-

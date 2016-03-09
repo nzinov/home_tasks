@@ -28,7 +28,7 @@ public:
     }
 };
 
-const std::size_t TARGET = 10000000;
+const std::size_t TARGET = 500'000'000;
 
 template<typename Mutex> void add(std::size_t& local, std::size_t& global, Mutex* mutex) {
     while (true) {
@@ -70,7 +70,9 @@ template<typename Mutex> void test(std::size_t thread_num) {
 
 int main() {
     for (std::size_t thread_num : {std::thread::hardware_concurrency() / 2, std::thread::hardware_concurrency() * 2}) {
+        std::cout << "thread_num: " << thread_num << ", mutex type: Futex" << std::endl;
         test<Futex>(thread_num);
+        std::cout << "thread_num: " << thread_num << ", mutex type: std::mutex" << std::endl;
         test<std::mutex>(thread_num);
     }
 }

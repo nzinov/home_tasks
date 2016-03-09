@@ -1,0 +1,20 @@
+thread_num: 1, mutex type: Futex
+thread-local counts: 500000000 
+sum of counters: 500000000
+global counter: 500000000
+time: 94330 ms
+thread_num: 1, mutex type: std::mutex
+thread-local counts: 500000000 
+sum of counters: 500000000
+global counter: 500000000
+time: 35943 ms
+thread_num: 4, mutex type: Futex
+thread-local counts: 124487794 125926489 124815365 124770352 
+sum of counters: 500000000
+global counter: 500000000
+time: 155575 ms
+thread_num: 4, mutex type: std::mutex
+thread-local counts: 126796651 123409084 123579255 126215010 
+sum of counters: 500000000
+global counter: 500000000
+time: 76450 ms

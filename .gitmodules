@@ -1,3 +1,0 @@
-[submodule "semester2/googletest"]
-	path = semester2/googletest
-	url = https://github.com/smarr/googletest

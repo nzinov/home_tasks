@@ -2,18 +2,9 @@
 #include <condition_variable>
 #include <queue>
 #include <stack>
+#include <experimental/optional>
 
-struct EmptyContainer {
-};
-
-template <typename Container> class Adapter {
-    Container data;
-    typedef typename Container::value_type T;
-
-    void push_back(T el);
-    T pop_back();
-    bool empty();
-};
+using std::experimental::optional;
 
 template <typename Container> class SyncContainer {
     Container data;
@@ -22,15 +13,9 @@ template <typename Container> class SyncContainer {
     typedef typename Container::value_type T;
 
     void push(T el);
-    T pop_nowait();
+    optional<T> pop_nowait();
     T pop();
 };
-
-template<typename Container> void Adapter::push_back(Adapter::T el) {
-    data.push(el);
-}
-
-template<typename Container> T Adapter::
 
 template<typename Container> void SyncContainer<Container>::push(SyncContainer::T el) {
     std::unique_lock<std::mutex> lock(op);
@@ -38,10 +23,10 @@ template<typename Container> void SyncContainer<Container>::push(SyncContainer::
     not_empty.notify_all();
 }
 
-template<typename Container> typename SyncContainer<Container>::T SyncContainer<Container>::pop_nowait() {
+template<typename Container> optional<typename SyncContainer<Container>::T> SyncContainer<Container>::pop_nowait() {
     std::unique_lock<std::mutex> lock(op);
     if (data.empty()) {
-        throw EmptyContainer();
+        return optional<T>();
     }
     return data.pop_back();
 }

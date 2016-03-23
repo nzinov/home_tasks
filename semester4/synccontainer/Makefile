@@ -1,2 +1,2 @@
 main : main.cpp
-	g++ -std=c++11 -pthread main.cpp -o main
+	g++ -std=c++17 -pthread main.cpp -o main

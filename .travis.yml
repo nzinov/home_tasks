@@ -4,4 +4,4 @@ cache:
 compiler:
   - gcc
 script:
-  - true
+    - make -C semester4/synccontainer

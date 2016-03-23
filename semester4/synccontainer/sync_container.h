@@ -12,6 +12,7 @@ template <typename Container> class SyncContainer {
     std::condition_variable not_empty;
     typedef typename Container::value_type T;
 
+public:
     void push(T el);
     optional<T> pop_nowait();
     T pop();
@@ -28,7 +29,9 @@ template<typename Container> optional<typename SyncContainer<Container>::T> Sync
     if (data.empty()) {
         return optional<T>();
     }
-    return data.pop_back();
+    T el = data.back();
+    data.pop_back();
+    return el;
 }
 
 template<typename Container> typename SyncContainer<Container>::T SyncContainer<Container>::pop() {
@@ -36,5 +39,7 @@ template<typename Container> typename SyncContainer<Container>::T SyncContainer<
     while (data.empty()) {
         not_empty.wait(lock);
     }
-    return data.pop_back();
+    T el = data.back();
+    data.pop_back();
+    return el;
 }

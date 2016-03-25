@@ -2,6 +2,8 @@
 #include <vector>
 #include <list>
 #include <deque>
+#include <queue>
+#include <stack>
 #include <thread>
 #include <mutex>
 #include "gtest/gtest.h"
@@ -16,7 +18,7 @@ template<typename T> struct SyncContainerTest : ::testing::Test {
     SyncContainerTest() : used(THREAD_NUM*SIZE) {}
 };
 
-typedef ::testing::Types<std::vector<int>, std::deque<int>, std::list<int> > MyTypes;
+typedef ::testing::Types<std::vector<int>, std::deque<int>, std::list<int>, std::queue<int>, std::stack<int> > MyTypes;
 TYPED_TEST_CASE(SyncContainerTest, MyTypes);
 
 template<typename T> void test_push(SyncContainer<T>& cont, int shift) {

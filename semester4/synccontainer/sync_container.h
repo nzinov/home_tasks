@@ -21,7 +21,7 @@ public:
 template<typename Container> void SyncContainer<Container>::push(SyncContainer::T el) {
     std::unique_lock<std::mutex> lock(op);
     data.push_back(el);
-    not_empty.notify_all();
+    not_empty.notify_one();
 }
 
 template<typename Container> optional<typename SyncContainer<Container>::T> SyncContainer<Container>::pop_nowait() {

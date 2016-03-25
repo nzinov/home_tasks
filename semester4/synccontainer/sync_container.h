@@ -11,13 +11,6 @@ template <typename Container> class SyncContainer {
     std::mutex op;
     std::condition_variable not_empty;
     typedef typename Container::value_type T;
-    auto _push(typename Container::value_type el, int = 0) -> decltype(data.push(el), void());
-    auto _push(typename Container::value_type el) -> decltype(data.push_back(el), void());
-    auto _pop(int = 0) -> decltype(data.pop(), T());
-    auto _pop() -> decltype(data.pop_back(), T());
-    auto _top() -> decltype(data.top(), T());
-    auto _top(int = 0) -> decltype(data.pop(), T());
-    auto _top(long = 0) -> decltype(data.pop_back(), T());
 
 public:
     void push(T el);
@@ -25,41 +18,41 @@ public:
     T pop();
 };
 
-template<typename Container> auto SyncContainer<Container>::_push(typename Container::value_type el, int) -> decltype(data.push(el), void()){
-    data.push(el);
+template<typename Container> auto _top(Container& cont, int) -> decltype(cont.top(), typename Container::value_type()) {
+    return cont.top();
 }
 
-template<typename Container> auto SyncContainer<Container>::_push(typename Container::value_type el) -> decltype(data.push_back(el), void()) {
-    data.push_back(el);
+template<typename Container> auto _top(Container& cont, long) -> decltype(cont.pop(), typename Container::value_type()) {
+    return cont.front();
 }
 
-template<typename Container> auto SyncContainer<Container>::_pop(int) -> decltype(data.pop(), T()) {
-    T el = _top();
-    data.pop();
+template<typename Container> auto _top(Container& cont, long long) -> decltype(cont.pop_back(), typename Container::value_type()) {
+    return cont.back();
+}
+
+template<typename Container> auto _push(Container& cont, typename Container::value_type el, int) -> decltype(cont.push(el), void()){
+    cont.push(el);
+}
+
+template<typename Container> auto _push(Container& cont, typename Container::value_type el, long) -> decltype(cont.push_back(el), void()) {
+    cont.push_back(el);
+}
+
+template<typename Container> auto _pop(Container& cont, int) -> decltype(cont.pop(), typename Container::value_type()) {
+    typename Container::value_type el = _top(cont, 0);
+    cont.pop();
     return el;
 }
 
-template<typename Container> auto SyncContainer<Container>::_pop() -> decltype(data.pop_back(), T()) {
-    T el = _top();
-    data.pop_back();
+template<typename Container> auto _pop(Container& cont, long) -> decltype(cont.pop_back(), typename Container::value_type()) {
+    typename Container::value_type el = _top(cont, 0);
+    cont.pop_back();
     return el;
-}
-
-template<typename Container> auto SyncContainer<Container>::_top() -> decltype(data.top(), T()) {
-    return data.top();
-}
-
-template<typename Container> auto SyncContainer<Container>::_top(int) -> decltype(data.pop(), T()) {
-    return data.front();
-}
-
-template<typename Container> auto SyncContainer<Container>::_top(long) -> decltype(data.pop_back(), T()) {
-    return data.back();
 }
 
 template<typename Container> void SyncContainer<Container>::push(SyncContainer::T el) {
     std::unique_lock<std::mutex> lock(op);
-    _push(el);
+    _push(data, el, 0);
     not_empty.notify_one();
 }
 
@@ -68,7 +61,7 @@ template<typename Container> optional<typename SyncContainer<Container>::T> Sync
     if (data.empty()) {
         return optional<T>();
     }
-    return _pop();
+    return _pop(data, 0);
 }
 
 template<typename Container> typename SyncContainer<Container>::T SyncContainer<Container>::pop() {
@@ -76,5 +69,5 @@ template<typename Container> typename SyncContainer<Container>::T SyncContainer<
     while (data.empty()) {
         not_empty.wait(lock);
     }
-    return _pop();
+    return _pop(data, 0);
 }

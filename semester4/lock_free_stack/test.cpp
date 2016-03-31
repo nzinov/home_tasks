@@ -25,7 +25,7 @@ void test_pop(LockFreeStack<int>& stack, std::vector<int>& used) {
 
 TEST(LockFreeStackTest, Test) {
     std::vector<std::thread> threads;
-    std::vector<int> used(SIZE*THREAD_NUM);
+    std::vector<int> used(SIZE*THREAD_NUM, 0);
     LockFreeStack<int> obj;
     for (int i = 0; i < THREAD_NUM; ++i) {
         threads.emplace_back(test_push, std::ref(obj), SIZE*i);
@@ -37,7 +37,7 @@ TEST(LockFreeStackTest, Test) {
         t.join();
     }
     for (int i = 0; i < THREAD_NUM*SIZE; ++i) {
-        ASSERT_FALSE(used[i]) << "i = " << i;
+        ASSERT_TRUE(used[i]) << "i = " << i;
     }
 }
 

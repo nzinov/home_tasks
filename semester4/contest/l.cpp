@@ -19,13 +19,18 @@ struct Margin {
     int right;
 };
 
-void add(int x, int a) {
+Margin margins[100000];
+int answers[100000];
+std::vector<std::vector<int> > left_requests(100000);
+std::vector<std::vector<int> > right_requests(100000);
+
+inline void add(int x) {
     for (int i = x; i < n; i = (i | (i + 1))) {
-        tree[i] += a;
+        ++tree[i];
     }
 }
 
-int sum(int x) {
+inline int sum(int x) {
     if (x == -1) {
         return 0;
     }
@@ -36,22 +41,9 @@ int sum(int x) {
     return result;
 }
 
-int get(Margin m) {
+inline int get(Margin m) {
     return sum(m.right) - sum(m.left - 1);
 }
-
-struct Request {
-    int x;
-    int index;
-    bool enter;
-
-    friend bool operator<(const Request& a, const Request& b) {
-        if (a.x == b.x) {
-            return a.enter;
-        }
-        return a.x < b.x;
-    }
-};
 
 int main() {
 #ifdef DEBUG
@@ -65,11 +57,6 @@ int main() {
     out.sync_with_stdio(false);
     int m;
     in >> n >> m;
-    std::vector<Request> requests;
-    std::vector<Margin> margins;
-    requests.reserve(2*m);
-    margins.reserve(m);
-    std::vector<int> answers(m);
     for (int c = 0; c < n; ++c) {
         in >> numbers[c];
         numbers[c]--;
@@ -77,26 +64,20 @@ int main() {
     for (int i = 0; i < m; ++i) {
         int x1, x2, y1, y2;
         in >> x1 >> x2 >> y1 >> y2;
-        margins.push_back(Margin{y1 - 1, y2 - 1});
-        requests.push_back(Request{x1 - 1, i, true});
-        requests.push_back(Request{x2 - 1, i, false});
+        margins[i] = Margin{y1 - 1, y2 - 1};
+        left_requests[x1-1].push_back(i);
+        right_requests[x2-1].push_back(i);
     }
-    std::sort(requests.begin(), requests.end());
-    int cur = 0;
     for (int c = 0; c < n; ++c) {
-        while (cur < 2*m && requests[cur].x == c && requests[cur].enter) {
-            int index = requests[cur].index;
+        for (int index : left_requests[c]) {
             answers[index] = get(margins[index]);
-            ++cur;
         }
-        add(numbers[c], 1);
-        while (cur < 2*m && requests[cur].x == c) {
-            int index = requests[cur].index;
+        add(numbers[c]);
+        for (int index : right_requests[c]) {
             answers[index] = get(margins[index]) - answers[index];
-            ++cur;
         }
     }
-    for (int ans : answers) {
-        out << ans << std::endl;
+    for (int i = 0; i < m; ++i) {
+        out << answers[i] << std::endl;
     }
 }

@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 const int THREAD_NUM = 3;
-const int SIZE = 1000000;
+const int SIZE = 10000000;
 
 void test_push(LockFreeStack<int>& stack, int shift) {
     for (int i = shift; i < shift + SIZE; ++i) {
@@ -40,4 +40,3 @@ TEST(LockFreeStackTest, Test) {
         ASSERT_TRUE(used[i]) << "i = " << i;
     }
 }
-

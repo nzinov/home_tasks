@@ -1,24 +1,32 @@
-struct Test {
-#ifdef BAD
-    char a;
-    char spacer1[63];
-    char b;
-    char spacer2[63];
-#else
-    char a;
-    char b;
-    char spacer2[62];
-#endif
+#include <thread>
 
-    Test() : a(0), b(0) {}
+struct TestData {
+    char a;
+#ifdef SPACER
+    char spacer[63];
+#endif
+    char b;
+
+    TestData() : a(0), b(0) {}
+};
+
+TestData data;
+
+const int N = 1'000'000'000;
+
+template<int pos> void test() {
+    for (int i = 0; i < N; ++i) {
+        if (pos) {
+            ++data.a;
+        } else {
+            ++data.b;
+        }
+    }
 };
 
 int main() {
-    Test test[511];
-    for (int c = 0; c < N; ++c) {
-        for (int i = 0; i < 511; ++i) {
-            ++test[i].a;
-            ++test[i].b;
-        }
-    }
-}
+    std::thread a(test<0>);
+    std::thread b(test<1>);
+    a.join();
+    b.join();
+};
